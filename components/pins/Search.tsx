@@ -25,13 +25,13 @@ export const Search = () => {
   }, []);
 
   return (
-    <div className="flex items-center justify-between gap-2 border-2 border-black px-2 w-2xl brutal-shadow-sm transition-shadow duration-200 has-[:focus]:shadow-none">
+    <div className="brutal-shadow-sm flex w-xl items-center justify-between gap-2 border-2 border-black px-2 transition-shadow duration-200 has-[:focus]:shadow-none">
       <div className="flex grow items-center gap-2">
-        <SearchIcon className="w-4 shrink-0 text-muted-foreground" />
+        <SearchIcon className="text-muted-foreground w-4 shrink-0" />
         <Input
           ref={inputRef}
           placeholder="Search titles, texts, anything"
-          className="border-none focus-visible:ring-0 focus-visible:border-none px-0"
+          className="border-none px-0 focus-visible:border-none focus-visible:ring-0"
           onKeyDown={(e) => {
             if (e.key === "Escape") {
               inputRef.current?.blur();

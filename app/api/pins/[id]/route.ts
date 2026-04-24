@@ -1,0 +1,84 @@
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import type { NextRequest } from "next/server";
+
+export async function GET(
+  _req: NextRequest,
+  ctx: RouteContext<"/api/pins/[id]">
+) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return Response.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await ctx.params;
+  const pin = await prisma.pin.findFirst({
+    where: { uniqueId: id, userId: session.user.id },
+  });
+
+  if (!pin) {
+    return Response.json({ error: "pin not found" }, { status: 404 });
+  }
+
+  return Response.json(pin);
+}
+
+export async function PUT(
+  request: NextRequest,
+  ctx: RouteContext<"/api/pins/[id]">
+) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return Response.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await ctx.params;
+  const body = await request.json();
+  const { title, link } = body;
+
+  if (!title || !link) {
+    return Response.json(
+      { error: "title and link are required" },
+      { status: 400 }
+    );
+  }
+
+  const existing = await prisma.pin.findFirst({
+    where: { uniqueId: id, userId: session.user.id },
+  });
+
+  if (!existing) {
+    return Response.json({ error: "pin not found" }, { status: 404 });
+  }
+
+  const pin = await prisma.pin.update({
+    where: { uniqueId: id },
+    data: { title, link },
+  });
+
+  return Response.json(pin);
+}
+
+export async function DELETE(
+  _req: NextRequest,
+  ctx: RouteContext<"/api/pins/[id]">
+) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return Response.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await ctx.params;
+  const existing = await prisma.pin.findFirst({
+    where: { uniqueId: id, userId: session.user.id },
+  });
+
+  if (!existing) {
+    return Response.json({ error: "pin not found" }, { status: 404 });
+  }
+
+  await prisma.pin.delete({ where: { uniqueId: id } });
+
+  return new Response(null, { status: 204 });
+}

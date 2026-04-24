@@ -1,11 +1,19 @@
 import { timeAgo } from "@/lib/utils";
 import { Typography } from "../typography/Typography";
 
-export const Pin = ({ pin }: { pin: any }) => {
-  const timeCreated = timeAgo(pin.createdAt);
+interface PinProps {
+  id: number;
+  uniqueId: string;
+  title: string;
+  link: string;
+  createdAt?: number | string;
+}
+
+export const Pin = ({ pin }: { pin: PinProps }) => {
+  const timeCreated = pin.createdAt ? timeAgo(Number(pin.createdAt)) : "";
 
   return (
-    <div className="border-muted-foreground/60 flex w-full items-center justify-between px-8 py-4">
+    <div className="border-muted-foreground/60 flex w-full items-center justify-between p-4">
       <div className="flex items-center gap-4">
         <div
           className="h-2 w-2 shrink-0 rounded-full"

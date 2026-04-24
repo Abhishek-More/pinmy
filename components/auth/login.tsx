@@ -4,7 +4,7 @@ import { authClient } from "@/lib/auth-client";
 import { useRef, useState } from "react";
 import { Typography } from "../typography/Typography";
 import { Input } from "../ui/input";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, LogOut } from "lucide-react";
 
 function PhoneStep({ onSubmit }: { onSubmit: (phone: string) => void }) {
   const [phone, setPhone] = useState("");
@@ -36,9 +36,11 @@ function PhoneStep({ onSubmit }: { onSubmit: (phone: string) => void }) {
         placeholder="Enter Phone Number"
         type="tel"
         inputMode="numeric"
+        autoComplete="tel"
+        name="phone"
         value={formatDisplay(phone)}
         onChange={(e) => {
-          const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+          const value = e.target.value.replace(/\D/g, "").replace(/^1/, "").slice(0, 10);
           setPhone(value);
           if (phoneError) setPhoneError(false);
         }}
@@ -47,9 +49,29 @@ function PhoneStep({ onSubmit }: { onSubmit: (phone: string) => void }) {
       />
       <div
         onClick={handleSubmit}
-        className="flex cursor-pointer flex-col items-center justify-center bg-black px-2 hover:bg-slate-700"
+        className="flex cursor-pointer flex-col items-center justify-center bg-black px-4 hover:bg-slate-700"
       >
         <ArrowRight className="w-4 text-white" />
+      </div>
+    </div>
+  );
+}
+
+function LoggedInStep() {
+  const { data: session } = authClient.useSession();
+
+  if (!session) return null;
+
+  return (
+    <div className="flex gap-2">
+      <div className="flex flex-col items-center">
+        <Typography variant="large">{session.user.name}</Typography>
+      </div>
+      <div
+        onClick={() => authClient.signOut()}
+        className="flex cursor-pointer flex-col items-center justify-center bg-black px-4 hover:bg-slate-700"
+      >
+        <LogOut className="w-4 text-white" />
       </div>
     </div>
   );
@@ -124,7 +146,7 @@ function OtpStep({ onSubmit }: { onSubmit: (code: string) => void }) {
 }
 
 export function Login() {
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession();
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [phone, setPhone] = useState("");
 
@@ -135,14 +157,11 @@ export function Login() {
 
   const handlePhoneSubmit = async (phoneInput: string) => {
     setPhone(phoneInput);
+    setStep("otp");
 
-    const res = await authClient.phoneNumber.sendOtp({
+    authClient.phoneNumber.sendOtp({
       phoneNumber: formatPhone(phoneInput),
     });
-
-    if (!res.error) {
-      setStep("otp");
-    }
   };
 
   const handleOtpSubmit = async (code: string) => {
@@ -156,19 +175,15 @@ export function Login() {
     }
   };
 
-  const logout = async () => {
-    await authClient.signOut();
-    setStep("phone");
-  };
+  if (isPending || session) return null;
 
   return (
-    <div className="brutal-shadow flex w-[300px] flex-col gap-2 border-2 border-black px-4 pt-4 pb-5">
-      <LoginHeader step={step} />
-
-      {step === "phone" && <PhoneStep onSubmit={handlePhoneSubmit} />}
-      {step === "otp" && <OtpStep onSubmit={handleOtpSubmit} />}
-
-      {session && <button onClick={logout}>Logout</button>}
+    <div className="brutal-shadow flex w-[300px] flex-col gap-2 border-2 border-black bg-white px-4 pt-4 pb-5">
+      <>
+        <LoginHeader step={step} />
+        {step === "phone" && <PhoneStep onSubmit={handlePhoneSubmit} />}
+        {step === "otp" && <OtpStep onSubmit={handleOtpSubmit} />}
+      </>
     </div>
   );
 }

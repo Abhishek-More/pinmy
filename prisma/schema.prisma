@@ -62,6 +62,9 @@ model Verification {
 
 model User {
   id                  String    @id @default(cuid())
+  name                String?
+  email               String?
+  emailVerified       Boolean?
   pins                Pin[]
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
@@ -70,14 +73,27 @@ model User {
   sessions            Session[]
   accounts            Account[]
 
+  image String?
+
   @@unique([phoneNumber])
   @@map("user")
 }
 
 model Pin {
-  id     Int    @id @default(autoincrement())
-  title  String
-  link   String
-  User   User   @relation(fields: [userId], references: [id])
-  userId String
+  id       Int    @id @default(autoincrement())
+  uniqueId String @unique @default(dbgenerated("concat('pin_', gen_random_uuid())")) @map("unique_id")
+  title    String
+  link     String
+  User     User   @relation(fields: [userId], references: [id])
+  userId   String
+}
+
+model Jwks {
+  id         String    @id
+  publicKey  String
+  privateKey String
+  createdAt  DateTime
+  expiresAt  DateTime?
+
+  @@map("jwks")
 }

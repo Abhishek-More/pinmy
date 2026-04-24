@@ -4,8 +4,8 @@ import { Search } from "@/components/pins/Search";
 
 export default function Home() {
   return (
-    <div className="mx-auto mt-16 flex w-4xl flex-col items-center gap-8">
-      <div className="absolute top-16 right-16">
+    <div className="mx-auto mt-16 flex w-3xl flex-col items-center gap-16">
+      <div className="absolute top-16 right-16 flex items-center gap-4">
         <Login />
       </div>
       <Search />
