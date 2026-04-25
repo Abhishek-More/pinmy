@@ -1,13 +1,14 @@
 "use client";
 
 import { SearchIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Input } from "../ui/input";
 import { Typography } from "../typography/Typography";
 
-export const Search = () => {
+export const Search = ({ onSearch }: { onSearch: (query: string) => void }) => {
   const [modifierKey, setModifierKey] = useState("ctrl");
   const inputRef = useRef<HTMLInputElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   useEffect(() => {
     const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
@@ -24,6 +25,16 @@ export const Search = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  const handleChange = useCallback(
+    (value: string) => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        onSearch(value.trim());
+      }, 300);
+    },
+    [onSearch],
+  );
+
   return (
     <div className="brutal-shadow-sm flex w-xl items-center justify-between gap-2 border-2 border-black px-2 transition-shadow duration-200 has-[:focus]:shadow-none">
       <div className="flex grow items-center gap-2">
@@ -32,6 +43,7 @@ export const Search = () => {
           ref={inputRef}
           placeholder="Search titles, texts, anything"
           className="border-none px-0 focus-visible:border-none focus-visible:ring-0"
+          onChange={(e) => handleChange(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Escape") {
               inputRef.current?.blur();

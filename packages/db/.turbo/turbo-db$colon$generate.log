@@ -1,0 +1,12 @@
+
+
+> @pinmy/db@0.1.0 db:generate /Users/abhishekmore/Code/pinmy/packages/db
+> prisma generate
+
+[2mLoaded Prisma config from prisma.config.ts.
+[22m
+[2mPrisma schema loaded from prisma/schema.prisma.[22m
+
+
+✔ Generated [1mPrisma Client[22m (7.8.0)[2m to ./src/generated[22m in 30ms
+

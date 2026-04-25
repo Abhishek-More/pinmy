@@ -18,10 +18,17 @@ import { authClient } from "@/lib/auth-client";
 import { samplePins } from "@/lib/constants";
 import { PinRequests, type PinData } from "@/lib/PinRequests";
 
-export const PinStream = () => {
+export const PinStream = ({ searchQuery = "" }: { searchQuery?: string }) => {
   const { data: session, isPending } = authClient.useSession();
+
+  const swrKey = session?.user
+    ? searchQuery
+      ? `/api/pins?q=${encodeURIComponent(searchQuery)}`
+      : "/api/pins"
+    : null;
+
   const { data: fetchedPins, mutate } = useSWR<PinData[]>(
-    session?.user ? "/api/pins" : null,
+    swrKey,
     PinRequests.list,
   );
 

@@ -1,11 +1,20 @@
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { searchPins } from "@pinmy/db";
 
-export async function GET() {
+export async function GET(request: Request) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(request.url);
+  const q = searchParams.get("q")?.trim();
+
+  if (q) {
+    const results = await searchPins(q, session.user.id);
+    return Response.json(results);
   }
 
   const pins = await prisma.pin.findMany({

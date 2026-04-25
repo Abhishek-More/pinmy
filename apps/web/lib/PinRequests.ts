@@ -3,7 +3,9 @@ export interface PinData {
   uniqueId: string;
   title: string;
   link: string;
+  description?: string | null;
   userId: string;
+  snippet?: string | null;
 }
 
 const BASE = "/api/pins";
@@ -15,8 +17,10 @@ async function handleResponse<T>(res: Response): Promise<T> {
 }
 
 export const PinRequests = {
-  list: (_key?: string): Promise<PinData[]> =>
-    fetch(BASE).then((res) => handleResponse<PinData[]>(res)),
+  list: (key?: string): Promise<PinData[]> => {
+    const url = key && key !== BASE ? key : BASE;
+    return fetch(url).then((res) => handleResponse<PinData[]>(res));
+  },
 
   get: (uniqueId: string) => fetch(`${BASE}/${uniqueId}`).then(handleResponse),
 

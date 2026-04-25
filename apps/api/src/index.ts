@@ -1,11 +1,12 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
+import { webhook } from "./routes/webhook";
+import { health } from "./routes/health";
 
 const app = new Hono();
 
-app.get("/", (c) => {
-  return c.text("Hello Hono!");
-});
+app.route("/", health);
+app.route("/webhook", webhook);
 
 serve(
   {
