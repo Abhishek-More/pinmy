@@ -5,6 +5,7 @@ import useSWR from "swr";
 import { Typography } from "../typography/Typography";
 import { PinSkeleton } from "./PinSkeleton";
 import { Pin } from "./Pin";
+import { EmptyState } from "./EmptyState";
 import {
   Dialog,
   DialogContent,
@@ -75,11 +76,13 @@ export const PinStream = () => {
     <div className="w-full">
       <div className="flex flex-col gap-4">
         {pins
-          ? pins.map((pin) => (
-              <div key={pin.uniqueId}>
-                <Pin pin={pin} />
-              </div>
-            ))
+          ? pins.length > 0
+            ? pins.map((pin) => (
+                <div key={pin.uniqueId}>
+                  <Pin pin={pin} />
+                </div>
+              ))
+            : session?.user && <EmptyState />
           : Array.from({ length: 2 }).map((_, i) => (
               <PinSkeleton key={`skeleton-${i}`} />
             ))}

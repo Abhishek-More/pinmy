@@ -1,20 +1,15 @@
-/**
- * Yields chunks one at a time so we never hold all chunks in memory.
- */
-export function* chunkText(
+export function chunkText(
   text: string,
   size = 5000,
-): Generator<{ sequence: number; content: string }> {
-  if (!text) return;
-
-  const trimmed = text.trim();
-  if (!trimmed) return;
+): { sequence: number; content: string }[] {
+  const trimmed = text?.trim();
+  if (!trimmed) return [];
 
   if (trimmed.length <= size) {
-    yield { sequence: 0, content: trimmed };
-    return;
+    return [{ sequence: 0, content: trimmed }];
   }
 
+  const chunks: { sequence: number; content: string }[] = [];
   let start = 0;
   let sequence = 0;
 
@@ -33,11 +28,12 @@ export function* chunkText(
 
     const chunk = trimmed.slice(start, end).trim();
     if (chunk) {
-      yield { sequence, content: chunk };
+      chunks.push({ sequence, content: chunk });
       sequence++;
     }
 
     start = end;
-    if (start >= trimmed.length) break;
   }
+
+  return chunks;
 }

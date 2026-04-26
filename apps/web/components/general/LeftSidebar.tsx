@@ -55,12 +55,7 @@ const CollectionsSection = () => {
     <div className="flex flex-col gap-0">
       <div className="mb-3 flex w-1/2 items-center gap-2">
         <div className="h-px flex-1 bg-black/20" />
-        <Typography
-          variant="small"
-          className="text-xs tracking-widest uppercase"
-        >
-          Collections
-        </Typography>
+        <Typography variant="label">Collections</Typography>
         <div className="h-px flex-1 bg-black/20" />
       </div>
       {collections.map((col) => (
@@ -102,12 +97,13 @@ export const LeftSidebar = () => {
       {/* Logo */}
       <div>
         <div className="flex items-baseline">
-          <Typography variant="h1" className="text-4xl">
+          <Typography variant="display" as="h1">
             Pin
           </Typography>
           <Typography
-            variant="h1"
-            className="bg-accent border-2 border-black px-1 text-4xl"
+            variant="display"
+            as="span"
+            className="bg-accent border-2 border-black px-1"
           >
             My
           </Typography>

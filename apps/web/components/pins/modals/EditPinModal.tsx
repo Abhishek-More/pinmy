@@ -68,7 +68,7 @@ export const EditPinModal = () => {
       tagColor="#C77DFF"
       title="Edit Pin"
       titleRight={
-        <Typography variant="muted" className="text-xs">
+        <Typography variant="detail">
           // {savedAgo ? ` saved ${savedAgo} ago` : ""}
         </Typography>
       }
@@ -109,7 +109,7 @@ export const EditPinModal = () => {
                 )}
               </button>
             </div>
-            <Typography variant="muted" className="text-xs">
+            <Typography variant="detail">
               {link ? cleanURL(link) : ""}
             </Typography>
           </div>

@@ -1,16 +1,32 @@
 import { cn } from "@/lib/utils";
 
-type Variant = "h1" | "h2" | "h3" | "p" | "lead" | "large" | "small" | "muted";
+type Variant =
+  | "h1"
+  | "h2"
+  | "h3"
+  | "p"
+  | "lead"
+  | "large"
+  | "small"
+  | "muted"
+  | "tag"
+  | "label"
+  | "detail"
+  | "display";
 
 const variantStyles: Record<Variant, string> = {
   h1: "scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-2xl",
-  h2: "scroll-m-20 text-2xl font-semibold tracking-tight",
+  h2: "scroll-m-20 text-2xl font-bold tracking-tight",
   h3: "scroll-m-20 text-xl font-semibold tracking-tight",
   p: "leading-7 text-base",
   lead: "text-xl text-muted-foreground",
-  large: "text-lg font-semibold",
-  small: "text-sm font-medium leading-none",
+  large: "text-lg font-bold leading-tight",
+  small: "text-xs font-medium leading-none",
   muted: "text-sm text-muted-foreground",
+  tag: "text-xs font-bold tracking-wide uppercase leading-none",
+  label: "text-xs font-medium tracking-widest uppercase leading-none",
+  detail: "text-xs text-muted-foreground",
+  display: "text-4xl font-bold tracking-tight",
 };
 
 const variantElements: Record<Variant, keyof React.JSX.IntrinsicElements> = {
@@ -22,6 +38,10 @@ const variantElements: Record<Variant, keyof React.JSX.IntrinsicElements> = {
   large: "div",
   small: "small",
   muted: "p",
+  tag: "span",
+  label: "span",
+  detail: "span",
+  display: "p",
 };
 
 interface TypographyProps {

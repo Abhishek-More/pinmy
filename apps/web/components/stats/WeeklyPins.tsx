@@ -72,10 +72,7 @@ export const WeeklyPins = () => {
 
   return (
     <div className="flex flex-col gap-4 border-[3px] border-black bg-[#1a1a1a] p-5">
-      <Typography
-        variant="small"
-        className="text-xs tracking-widest text-white/60 uppercase"
-      >
+      <Typography variant="label" className="text-white/60">
         Last 7 Days
       </Typography>
       {isLoading ? <WeeklyPinsSkeleton /> : <WeeklyPinsChart data={data} />}

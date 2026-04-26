@@ -81,12 +81,7 @@ function ModalRoot({
             style={{ backgroundColor: tagColor }}
           >
             <div className="h-2 w-2 rounded-sm bg-black" />
-            <Typography
-              variant="small"
-              className="text-xs font-bold tracking-wide uppercase"
-            >
-              {tag}
-            </Typography>
+            <Typography variant="tag">{tag}</Typography>
           </div>
           <Button
             variant="ghost"
