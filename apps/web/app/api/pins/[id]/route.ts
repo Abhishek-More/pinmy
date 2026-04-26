@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/clients/auth";
+import { prisma } from "@/lib/clients/prisma";
 import type { NextRequest } from "next/server";
 
 export async function GET(

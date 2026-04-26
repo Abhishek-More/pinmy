@@ -4,9 +4,10 @@ import { phoneNumber, jwt } from "better-auth/plugins";
 import { prisma } from "./prisma";
 
 const getTwilioService = () =>
-  import("../features/twilio/twilio.service");
+  import("../../features/twilio/twilio.service");
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL,
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),

@@ -6,7 +6,7 @@ const variantStyles: Record<Variant, string> = {
   h1: "scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-2xl",
   h2: "scroll-m-20 text-2xl font-semibold tracking-tight",
   h3: "scroll-m-20 text-xl font-semibold tracking-tight",
-  p: "leading-7",
+  p: "leading-7 text-base",
   lead: "text-xl text-muted-foreground",
   large: "text-lg font-semibold",
   small: "text-sm font-medium leading-none",

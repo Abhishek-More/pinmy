@@ -1,45 +1,58 @@
-import { timeAgo } from "@/lib/utils";
+import { cleanURL, timeAgo } from "@/lib/utils";
 import { Typography } from "../typography/Typography";
+import { Ellipsis } from "lucide-react";
+import { useModalStore } from "@/lib/stores/useModalStore";
+import type { PinWithSnippet } from "@/lib/requests/PinRequests";
 
-interface PinProps {
-  id: number;
-  uniqueId: string;
-  title: string;
-  link: string;
-  createdAt?: number | string;
-  snippet?: string | null;
-}
-
-export const Pin = ({ pin }: { pin: PinProps }) => {
-  const timeCreated = pin.createdAt ? timeAgo(Number(pin.createdAt)) : "";
-
+export const Pin = ({ pin }: { pin: PinWithSnippet }) => {
+  const timeCreated = timeAgo(pin.createdAt);
+  const openEditPin = useModalStore((s) => s.openEditPin);
   return (
-    <div className="border-muted-foreground/60 flex w-full flex-col p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div
-            className="h-2 w-2 shrink-0 rounded-full"
-            style={{ backgroundColor: "#C77DFF" }}
-          />
-          <div>
-            <Typography className="leading-4 font-semibold">
+    <div className="group relative w-full border-[3px] border-black bg-white p-5 pt-5">
+      {/* Purple tag */}
+      <div className="absolute -top-3 left-4 flex items-center gap-1.5 border-2 border-black bg-[#C77DFF] px-2 py-0.5">
+        <div className="h-2 w-2 rounded-sm bg-black" />
+        <Typography variant="small" className="text-xs font-semibold">
+          ENG
+        </Typography>
+      </div>
+
+      {/* Main content */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex items-center">
+          <div className="min-w-0 flex-1">
+            <Typography className="text-lg leading-tight font-bold">
               {pin.title}
             </Typography>
             <a href={pin.link} target="_blank" rel="noreferrer">
-              <Typography variant="muted" className="underline">
-                {pin.link}
+              <Typography variant="muted" className="mt-1 underline">
+                {cleanURL(pin.link)}
               </Typography>
             </a>
           </div>
+
+          {/* Time / Menu */}
+          <div className="shrink-0 pl-4">
+            <Typography variant="muted" className="group-hover:hidden">
+              {timeCreated}
+            </Typography>
+            <button
+              className="hidden cursor-pointer rounded p-1 hover:bg-gray-100 group-hover:block"
+              onClick={() => openEditPin(pin)}
+            >
+              <Ellipsis className="h-4 w-4" />
+            </button>
+          </div>
         </div>
-        <Typography variant="muted">{timeCreated}</Typography>
+
+        {/* Search snippet */}
+        {pin.snippet && (
+          <p
+            className="text-muted-foreground [&_mark]:text-foreground mt-3 border-l-[3px] border-black pl-3 text-sm leading-relaxed [&_mark]:bg-yellow-200 [&_mark]:px-0.5"
+            dangerouslySetInnerHTML={{ __html: pin.snippet }}
+          />
+        )}
       </div>
-      {pin.snippet && (
-        <p
-          className="text-muted-foreground mt-2 ml-6 border-l-2 border-muted-foreground/20 pl-3 text-xs leading-relaxed [&_mark]:bg-yellow-200 [&_mark]:px-0.5 [&_mark]:text-foreground"
-          dangerouslySetInnerHTML={{ __html: pin.snippet }}
-        />
-      )}
     </div>
   );
 };

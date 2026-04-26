@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import useSWR from "swr";
 import { Typography } from "../typography/Typography";
+import { PinSkeleton } from "./PinSkeleton";
 import { Pin } from "./Pin";
 import {
   Dialog,
@@ -14,11 +15,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/clients/auth-browser";
 import { samplePins } from "@/lib/constants";
-import { PinRequests, type PinData } from "@/lib/PinRequests";
+import { PinRequests, type PinWithSnippet } from "@/lib/requests/PinRequests";
+import { usePinStore } from "@/lib/stores/usePinStore";
 
-export const PinStream = ({ searchQuery = "" }: { searchQuery?: string }) => {
+export const PinStream = () => {
+  const searchQuery = usePinStore((s) => s.searchQuery);
   const { data: session, isPending } = authClient.useSession();
 
   const swrKey = session?.user
@@ -27,7 +30,7 @@ export const PinStream = ({ searchQuery = "" }: { searchQuery?: string }) => {
       : "/api/pins"
     : null;
 
-  const { data: fetchedPins, mutate } = useSWR<PinData[]>(
+  const { data: fetchedPins } = useSWR<PinWithSnippet[]>(
     swrKey,
     PinRequests.list,
   );
@@ -41,7 +44,7 @@ export const PinStream = ({ searchQuery = "" }: { searchQuery?: string }) => {
   }, [isPending]);
 
   const isLoading = !timedOut && (isPending || (session?.user && !fetchedPins));
-  const pins = isLoading ? [] : (fetchedPins ?? samplePins);
+  const pins = isLoading ? null : (fetchedPins ?? samplePins);
   const [open, setOpen] = useState(false);
   const [link, setLink] = useState("");
   const [loading, setLoading] = useState(false);
@@ -58,7 +61,6 @@ export const PinStream = ({ searchQuery = "" }: { searchQuery?: string }) => {
 
     try {
       await PinRequests.create({ title: link, link });
-      await mutate();
       setLink("");
       setOpen(false);
     } catch {
@@ -70,34 +72,16 @@ export const PinStream = ({ searchQuery = "" }: { searchQuery?: string }) => {
 
   return (
     <div className="w-full">
-      <div className="flex h-10 items-center justify-between border-2 border-b-0 border-black pl-4">
-        <Typography className="font-semibold">Your Pins</Typography>
-        <button
-          className="h-full cursor-pointer bg-black px-4 text-white"
-          onClick={() => setOpen(true)}
-        >
-          + NEW
-        </button>
-      </div>
-      <div className="border-2 border-black">
-        {isLoading ? (
-          <div className="flex items-center gap-4 p-4">
-            <div className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-muted-foreground/40" />
-            <div className="flex-1 space-y-2">
-              <div className="h-3 w-3/4 animate-pulse rounded bg-muted-foreground/20" />
-              <div className="h-2 w-1/2 animate-pulse rounded bg-muted-foreground/10" />
-            </div>
-          </div>
-        ) : (
-          pins.map((pin, index) => (
-            <div
-              key={pin.uniqueId}
-              className={`border-muted-foreground/60 ${index !== pins.length - 1 ? "border-b-1" : ""}`}
-            >
-              <Pin pin={pin} />
-            </div>
-          ))
-        )}
+      <div className="flex flex-col gap-4">
+        {pins
+          ? pins.map((pin) => (
+              <div key={pin.uniqueId}>
+                <Pin pin={pin} />
+              </div>
+            ))
+          : Array.from({ length: 2 }).map((_, i) => (
+              <PinSkeleton key={`skeleton-${i}`} />
+            ))}
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>

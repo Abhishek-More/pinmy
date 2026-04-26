@@ -1,4 +1,4 @@
-import { twilioClient } from "@/lib/twilio";
+import { twilioClient } from "@/lib/clients/twilio";
 
 const VERIFY_SERVICE_SID = "VA70c5f3e71b3a228c30e7800dad3a1e52";
 

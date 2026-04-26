@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { searchPins } from "@pinmy/db";
+import { auth } from "@/lib/clients/auth";
+import { prisma } from "@/lib/clients/prisma";
+import { searchPins, decodeEntities } from "@pinmy/db";
 
 export async function GET(request: Request) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -37,12 +37,12 @@ export async function POST(request: Request) {
   if (!title || !link) {
     return Response.json(
       { error: "title and link are required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   const pin = await prisma.pin.create({
-    data: { title, link, userId: session.user.id },
+    data: { title: decodeEntities(title), link, userId: session.user.id },
   });
 
   return Response.json(pin, { status: 201 });

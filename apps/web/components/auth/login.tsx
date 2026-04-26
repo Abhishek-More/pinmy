@@ -1,6 +1,6 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/clients/auth-browser";
 import { useRef, useState } from "react";
 import { Typography } from "../typography/Typography";
 import { Input } from "../ui/input";

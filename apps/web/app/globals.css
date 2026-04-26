@@ -41,7 +41,7 @@
 }
 
 body {
-  background: #ffffff;
+  background: #f4f1e8;
   color: #171717;
 }
 
@@ -58,8 +58,8 @@ body {
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --accent: #ffd800;
+  --accent-foreground: #171717;
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
@@ -106,7 +106,7 @@ body {
 }
 
 @utility brutal-shadow {
-  --tw-shadow: -8px 6px 0px #111;
+  --tw-shadow: -6px 6px 0px #111;
   box-shadow:
     var(--tw-inset-shadow,), var(--tw-inset-ring-shadow,),
     var(--tw-ring-offset-shadow,), var(--tw-ring-shadow,), var(--tw-shadow);
@@ -124,6 +124,26 @@ body {
   box-shadow:
     var(--tw-inset-shadow,), var(--tw-inset-ring-shadow,),
     var(--tw-ring-offset-shadow,), var(--tw-ring-shadow,), var(--tw-shadow);
+}
+
+@utility brutal-shadow-accent {
+  position: relative;
+}
+
+@utility brutal-shadow-accent-wrapper {
+  position: relative;
+  display: inline-block;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    translate: -6px 6px;
+    background: var(--accent);
+    border: 2px solid #111;
+    z-index: -1;
+    pointer-events: none;
+  }
 }
 
 @layer base {
