@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
 
 export async function GET(
   _req: NextRequest,
-  ctx: RouteContext<"/api/pins/[id]">
+  ctx: RouteContext<"/api/pins/[id]">,
 ) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
@@ -18,7 +18,7 @@ export async function GET(
   });
 
   if (!pin) {
-    return Response.json({ error: "pin not found" }, { status: 404 });
+    return Response.json({ error: "Pin not found" }, { status: 404 });
   }
 
   return Response.json(pin);
@@ -26,7 +26,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  ctx: RouteContext<"/api/pins/[id]">
+  ctx: RouteContext<"/api/pins/[id]">,
 ) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
@@ -40,7 +40,7 @@ export async function PUT(
   if (!title || !link) {
     return Response.json(
       { error: "title and link are required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -62,7 +62,7 @@ export async function PUT(
 
 export async function DELETE(
   _req: NextRequest,
-  ctx: RouteContext<"/api/pins/[id]">
+  ctx: RouteContext<"/api/pins/[id]">,
 ) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
