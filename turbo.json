@@ -8,11 +8,25 @@
     },
     "build": {
       "dependsOn": ["^build", "^db:generate"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "env": [
+        "BETTER_AUTH_SECRET",
+        "BETTER_AUTH_URL",
+        "DATABASE_URL",
+        "TWILIO_SID",
+        "TWILIO_AUTH_TOKEN",
+        "QSTASH_URL",
+        "QSTASH_TOKEN",
+        "QSTASH_CURRENT_SIGNING_KEY",
+        "QSTASH_NEXT_SIGNING_KEY"
+      ]
     },
     "db:generate": {
       "inputs": ["prisma/schema.prisma"],
-      "outputs": ["src/generated/**"]
+      "outputs": ["src/generated/**"],
+      "env": [
+        "DATABASE_URL"
+      ]
     },
     "db:push": {
       "cache": false
