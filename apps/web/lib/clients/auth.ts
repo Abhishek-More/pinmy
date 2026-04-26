@@ -28,7 +28,7 @@ export const auth = betterAuth({
       },
       sendOTP: async ({ phoneNumber }) => {
         const { sendVerificationCode } = await getTwilioService();
-        sendVerificationCode(phoneNumber);
+        await sendVerificationCode(phoneNumber);
       },
       verifyOTP: async ({ phoneNumber, code }) => {
         const { verifyCode } = await getTwilioService();
