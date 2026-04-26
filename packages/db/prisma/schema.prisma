@@ -85,6 +85,9 @@ model Pin {
   title       String
   link        String
   description String?
+  category    String     @default("Other")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   User        User       @relation(fields: [userId], references: [id])
   userId      String
   chunks      PinChunk[]

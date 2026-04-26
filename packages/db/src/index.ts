@@ -9,3 +9,4 @@ const prisma = new PrismaClient({ adapter });
 export { prisma };
 export * from "./generated/client";
 export { searchPins, type SearchResult } from "./search";
+export { decodeEntities } from "./utils";

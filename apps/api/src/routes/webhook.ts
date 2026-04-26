@@ -3,6 +3,7 @@ import { prisma } from "@pinmy/db";
 import { validateURL } from "../utils/helpers";
 import { scrapeLink } from "../services/scraper.service";
 import { chunkText } from "../utils/chunker";
+import { classifyPin } from "../services/classifier.service";
 
 export const webhook = new Hono();
 
@@ -30,13 +31,17 @@ webhook.post("/twilio", async (c) => {
   }
 
   const scraped = await scrapeLink(link);
-  console.log("[webhook] scrape done, creating pin...");
+  console.log("[webhook] scrape done, classifying...");
+
+  const category = await classifyPin(scraped.title, scraped.description, link);
+  console.log("[webhook] category:", category);
 
   const pin = await prisma.pin.create({
     data: {
       title: scraped.title,
       link,
       description: scraped.description || null,
+      category,
       userId: user.id,
     },
   });

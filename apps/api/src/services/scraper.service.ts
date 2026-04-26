@@ -33,10 +33,12 @@ function extractText(html: string): string {
   return result;
 }
 
+import { decodeEntities } from "@pinmy/db";
+
 function extractMeta(html: string, patterns: RegExp[]): string {
   for (const pattern of patterns) {
     const match = html.match(pattern);
-    if (match?.[1]) return match[1].trim();
+    if (match?.[1]) return decodeEntities(match[1].trim());
   }
   return "";
 }
