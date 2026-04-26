@@ -31,10 +31,7 @@ webhook.post("/twilio", async (c) => {
   }
 
   const scraped = await scrapeLink(link);
-  console.log("[webhook] scrape done, classifying...");
-
   const category = await classifyPin(scraped.title, scraped.description, link);
-  console.log("[webhook] category:", category);
 
   const pin = await prisma.pin.create({
     data: {
@@ -45,9 +42,7 @@ webhook.post("/twilio", async (c) => {
       userId: user.id,
     },
   });
-  console.log("[webhook] pin created:", pin.id);
 
-  console.log(`[webhook] chunking content, length=${scraped.content.length}`);
   for (const chunk of chunkText(scraped.content)) {
     await prisma.pinChunk.create({
       data: {
@@ -56,9 +51,7 @@ webhook.post("/twilio", async (c) => {
         content: chunk.content,
       },
     });
-    console.log(`[webhook] inserted chunk ${chunk.sequence}`);
   }
 
-  console.log("[webhook] done");
   return c.json({ status: "created", pin }, 201);
 });
