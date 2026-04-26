@@ -21,11 +21,11 @@ export const Pin = ({ pin }: { pin: PinWithSnippet }) => {
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-center">
           <div className="min-w-0 flex-1">
-            <Typography className="text-lg leading-tight font-bold">
+            <Typography className="line-clamp-2 text-lg leading-tight font-bold">
               {pin.title}
             </Typography>
             <a href={pin.link} target="_blank" rel="noreferrer">
-              <Typography variant="muted" className="mt-1 underline">
+              <Typography variant="muted" className="mt-1 line-clamp-2 break-all underline">
                 {cleanURL(pin.link)}
               </Typography>
             </a>

@@ -41,17 +41,14 @@ async function createChunks(content: string, pinId: number) {
 // Twilio sends form-encoded data with From (phone) and Body (message text).
 // We just create the pin here and send the data to the message queue to queue up further processing.
 webhook.post("/twilio", async (c) => {
-  console.log("[webhook/twilio] incoming request");
   const body = await c.req.parseBody();
   const phone = body["From"] as string;
   const link = body["Body"] as string;
-  console.log("[webhook/twilio] phone=%s link=%s", phone, link);
 
   const { user, error } = await validateAndResolveUser(phone, link, c);
   if (error) return error;
 
   const scraped = await scrapeLink(link);
-  console.log("[webhook/twilio] scraped title=%s", scraped.title);
 
   const pin = await prisma.pin.create({
     data: {
@@ -62,9 +59,8 @@ webhook.post("/twilio", async (c) => {
       userId: user.id,
     },
   });
-  console.log("[webhook/twilio] pin created id=%s, queuing for processing", pin.uniqueId);
 
-  MessageQueueClient.publish("/webhook/general", {
+  MessageQueueClient.publish("/webhook/process", {
     phone: user.phoneNumber as string,
     link: pin.link,
     pinUniqueId: pin.uniqueId,
@@ -73,13 +69,11 @@ webhook.post("/twilio", async (c) => {
   return c.json({ status: "created", pin }, 201);
 });
 
-webhook.post("/general", async (c) => {
-  console.log("[webhook/general] incoming request");
+webhook.post("/process", async (c) => {
   const body = await c.req.json();
   const phone = body.phone as string;
   const link = body.link as string;
   const pinUniqueId = body.pinUniqueId as string;
-  console.log("[webhook/general] phone=%s link=%s pinUniqueId=%s", phone, link, pinUniqueId);
 
   const { error } = await validateAndResolveUser(phone, link, c);
   if (error) return error;
@@ -93,10 +87,13 @@ webhook.post("/general", async (c) => {
     return c.json({ error: "pin not found" }, 404);
   }
 
-  const { scraped } = await scrapeAndClassify(link);
-  console.log("[webhook/general] classified category=%s", scraped.title);
+  const { scraped, category } = await scrapeAndClassify(link);
   await createChunks(scraped.content, pin.id);
 
-  console.log("[webhook/general] done pin=%s", pin.uniqueId);
-  return c.json({ status: "created", pin }, 201);
+  const updatedPin = await prisma.pin.update({
+    where: { id: pin.id },
+    data: { category },
+  });
+
+  return c.json({ status: "created", pin: updatedPin }, 201);
 });

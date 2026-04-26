@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     data: { title: decodeEntities(title), link, userId: session.user.id },
   });
 
-  MessageQueueClient.publish("/webhook/general", {
+  MessageQueueClient.publish("/webhook/process", {
     phone: session.user.phoneNumber as string,
     link: pin.link,
     pinUniqueId: pin.uniqueId,
