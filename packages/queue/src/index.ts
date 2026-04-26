@@ -9,7 +9,7 @@ class MessageQueue {
     this.client = client;
   }
 
-  async publish<T extends Record<string, unknown>>(endpoint: string, body: T) {
+  async publish(endpoint: string, body: { phone: string; link: string; pinUniqueId: string }) {
     return this.client.publishJSON({
       url: BACKEND_API_URL + endpoint,
       body,

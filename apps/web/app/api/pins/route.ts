@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/clients/auth";
 import { prisma } from "@/lib/clients/prisma";
 import { searchPins, decodeEntities } from "@pinmy/db";
-import { MessageQueueClient } from "@/lib/clients/message-queue";
+import { MessageQueueClient } from "@pinmy/queue";
 
 export async function GET(request: Request) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
   });
 
   MessageQueueClient.publish("/webhook/general", {
-    phone: session.user.phoneNumber,
+    phone: session.user.phoneNumber as string,
     link: pin.link,
     pinUniqueId: pin.uniqueId,
   });

@@ -6,14 +6,14 @@ import useSWR from "swr";
 import { authClient } from "@/lib/clients/auth-browser";
 import { PinRequests, type DayCount } from "@/lib/requests/PinRequests";
 
-const DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+const SKELETON_DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 const SKELETON_HEIGHTS = [32, 16, 8, 48, 24, 6, 12];
 
 const WeeklyPinsSkeleton = () => (
   <>
     <Skeleton className="h-10 w-16 bg-white/10" />
     <div className="flex items-end justify-between gap-2" style={{ height: 80 }}>
-      {DAYS.map((day, i) => (
+      {SKELETON_DAYS.map((day, i) => (
         <div key={day} className="flex flex-1 flex-col items-center gap-1">
           <Skeleton
             className="w-full bg-white/10"
@@ -76,7 +76,7 @@ export const WeeklyPins = () => {
         variant="small"
         className="text-xs tracking-widest text-white/60 uppercase"
       >
-        This Week
+        Last 7 Days
       </Typography>
       {isLoading ? <WeeklyPinsSkeleton /> : <WeeklyPinsChart data={data} />}
     </div>

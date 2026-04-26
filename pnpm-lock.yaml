@@ -23,6 +23,9 @@ importers:
       '@pinmy/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@pinmy/queue':
+        specifier: workspace:*
+        version: link:../../packages/queue
       hono:
         specifier: ^4.12.15
         version: 4.12.15
@@ -57,12 +60,12 @@ importers:
       '@pinmy/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@pinmy/queue':
+        specifier: workspace:*
+        version: link:../../packages/queue
       '@tanstack/react-table':
         specifier: ^8.21.3
         version: 8.21.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@upstash/qstash':
-        specifier: ^2.10.1
-        version: 2.10.1
       '@upstash/redis':
         specifier: ^1.37.0
         version: 1.37.0
@@ -176,6 +179,16 @@ importers:
       prisma:
         specifier: ^7.7.0
         version: 7.8.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/queue:
+    dependencies:
+      '@upstash/qstash':
+        specifier: ^2.10.1
+        version: 2.10.1
+    devDependencies:
       typescript:
         specifier: ^5
         version: 5.9.3

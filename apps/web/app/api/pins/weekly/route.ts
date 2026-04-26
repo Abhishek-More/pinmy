@@ -9,29 +9,29 @@ export async function GET() {
   }
 
   const now = new Date();
-  const dayOfWeek = now.getDay();
-  const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-  const startOfWeek = new Date(now);
-  startOfWeek.setDate(now.getDate() - diff);
-  startOfWeek.setHours(0, 0, 0, 0);
+  const startDate = new Date(now);
+  startDate.setDate(now.getDate() - 6);
+  startDate.setHours(0, 0, 0, 0);
 
   const pins = await prisma.pin.findMany({
     where: {
       userId: session.user.id,
-      createdAt: { gte: startOfWeek },
+      createdAt: { gte: startDate },
     },
     select: { createdAt: true },
   });
 
-  const counts = new Array(7).fill(0);
-  for (const pin of pins) {
-    const d = pin.createdAt.getDay();
-    const idx = d === 0 ? 6 : d - 1;
-    counts[idx]++;
+  const DAY_LABELS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+  const data = [];
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(now);
+    date.setDate(now.getDate() - i);
+    date.setHours(0, 0, 0, 0);
+    const nextDate = new Date(date);
+    nextDate.setDate(date.getDate() + 1);
+    const count = pins.filter((p) => p.createdAt >= date && p.createdAt < nextDate).length;
+    data.push({ day: DAY_LABELS[date.getDay()], count });
   }
-
-  const DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
-  const data = DAYS.map((day, i) => ({ day, count: counts[i] }));
 
   return Response.json(data);
 }
