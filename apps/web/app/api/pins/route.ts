@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/clients/auth";
 import { prisma } from "@/lib/clients/prisma";
 import { searchPins, decodeEntities } from "@pinmy/db";
+import { MessageQueueClient } from "@/lib/clients/message-queue";
 
 export async function GET(request: Request) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -43,6 +44,12 @@ export async function POST(request: Request) {
 
   const pin = await prisma.pin.create({
     data: { title: decodeEntities(title), link, userId: session.user.id },
+  });
+
+  MessageQueueClient.publish("/webhook/general", {
+    phone: session.user.phoneNumber,
+    link: pin.link,
+    pinUniqueId: pin.uniqueId,
   });
 
   return Response.json(pin, { status: 201 });

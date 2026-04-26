@@ -55,3 +55,50 @@ webhook.post("/twilio", async (c) => {
 
   return c.json({ status: "created", pin }, 201);
 });
+
+webhook.post("/general", async (c) => {
+  const body = await c.req.parseBody();
+  const phone = body["phone"] as string;
+  const link = body["link"] as string;
+  const pinUniqueId = body["pinUniqueId"] as string;
+
+  if (!phone || !link || !pinUniqueId) {
+    return c.json({ error: "phone and link are required" }, 400);
+  }
+
+  if (!validateURL(link)) {
+    return c.json({ error: "invalid link" }, 400);
+  }
+
+  const user = await prisma.user.findFirst({
+    where: { phoneNumber: phone },
+  });
+
+  if (!user) {
+    return c.json({ error: "user not found" }, 404);
+  }
+
+  const pin = await prisma.pin.findFirst({
+    where: { uniqueId: pinUniqueId },
+  });
+
+  if (!pin) {
+    return c.json({ error: "pin not found" }, 404);
+  }
+
+  const scraped = await scrapeLink(link);
+  const category = await classifyPin(scraped.title, scraped.description, link);
+
+  for (const chunk of chunkText(scraped.content)) {
+    await prisma.pinChunk.create({
+      data: {
+        pinId: pin.id,
+        sequence: chunk.sequence,
+        content: chunk.content,
+      },
+    });
+  }
+
+  console.log("Scraped Pin", pin);
+  return c.json({ status: "created", pin }, 201);
+});

@@ -6,8 +6,8 @@ const CATEGORIES = [
   "Engineering",
   "Design",
   "Research",
-  "Medicine",
   "Finance",
+  "Personal",
   "Notes",
   "Other",
 ] as const;
