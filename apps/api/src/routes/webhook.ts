@@ -75,10 +75,10 @@ webhook.post("/twilio", async (c) => {
 
 webhook.post("/general", async (c) => {
   console.log("[webhook/general] incoming request");
-  const body = await c.req.parseBody();
-  const phone = body["phone"] as string;
-  const link = body["link"] as string;
-  const pinUniqueId = body["pinUniqueId"] as string;
+  const body = await c.req.json();
+  const phone = body.phone as string;
+  const link = body.link as string;
+  const pinUniqueId = body.pinUniqueId as string;
   console.log("[webhook/general] phone=%s link=%s pinUniqueId=%s", phone, link, pinUniqueId);
 
   const { error } = await validateAndResolveUser(phone, link, c);
