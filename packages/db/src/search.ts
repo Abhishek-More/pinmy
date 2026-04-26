@@ -45,6 +45,7 @@ export async function searchPins(
         NULL::TEXT AS snippet
       FROM "Pin" p
       WHERE p."userId" = $2
+        AND p.archived_at IS NULL
         AND p.tsv @@ to_tsquery('english', $1)
     ),
     chunk_matches AS (
@@ -66,6 +67,7 @@ export async function searchPins(
       FROM "Pin" p
       INNER JOIN "pin_chunk" pc ON p.id = pc.pin_id
       WHERE p."userId" = $2
+        AND p.archived_at IS NULL
         AND pc.tsv @@ to_tsquery('english', $1)
       ORDER BY p.id, ts_rank_cd(pc.tsv, to_tsquery('english', $1), 32) DESC
     ),

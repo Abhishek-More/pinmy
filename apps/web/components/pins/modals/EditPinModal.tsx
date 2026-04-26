@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Check } from "lucide-react";
+import { X, Check, Copy } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { useModalStore } from "@/lib/stores/useModalStore";
@@ -22,6 +22,7 @@ export const EditPinModal = () => {
   const closeEditPin = useModalStore((s) => s.closeEditPin);
   const [title, setTitle] = useState("");
   const [action, setAction] = useState<EditAction>(editActions.IDLE);
+  const [copied, setCopied] = useState(false);
   const link = editPin?.link ?? "";
   const loading = action !== editActions.IDLE;
 
@@ -88,9 +89,26 @@ export const EditPinModal = () => {
 
         <div className="mt-4 flex flex-col gap-1.5">
           <div className="flex items-baseline justify-between">
-            <label className="text-xs font-bold tracking-wide uppercase">
-              Link
-            </label>
+            <div className="flex items-center gap-1.5">
+              <label className="text-xs font-bold tracking-wide uppercase">
+                Link
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(link);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+                className="cursor-pointer rounded p-0.5 hover:bg-gray-100"
+              >
+                {copied ? (
+                  <Check className="h-4 w-4 text-green-500" />
+                ) : (
+                  <Copy className="h-4 w-4 text-gray-400" />
+                )}
+              </button>
+            </div>
             <Typography variant="muted" className="text-xs">
               {link ? cleanURL(link) : ""}
             </Typography>
@@ -104,16 +122,27 @@ export const EditPinModal = () => {
       </Modal.Body>
 
       <Modal.Footer>
-        <Modal.Button variant="danger" onClick={handleDelete} disabled={loading}>
+        <Modal.Button
+          variant="danger"
+          onClick={handleDelete}
+          disabled={loading}
+        >
           <X className="h-3 w-3" />
           {action === editActions.DELETING ? "Deleting" : "Delete Pin"}
         </Modal.Button>
 
         <div className="flex items-center gap-2">
-          <Modal.Button variant="secondary" onClick={closeEditPin} disabled={loading}>
+          <Modal.Button
+            variant="secondary"
+            onClick={closeEditPin}
+            disabled={loading}
+          >
             Cancel
           </Modal.Button>
-          <Modal.Button onClick={handleSave} disabled={!title.trim() || loading}>
+          <Modal.Button
+            onClick={handleSave}
+            disabled={!title.trim() || loading}
+          >
             <Check className="h-3 w-3" />
             {action === editActions.SAVING ? "Saving" : "Save"}
           </Modal.Button>

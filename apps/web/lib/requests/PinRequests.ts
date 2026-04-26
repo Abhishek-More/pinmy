@@ -7,6 +7,8 @@ export interface Pin {
   title: string;
   link: string;
   description?: string | null;
+  category?: string;
+  status: string;
   userId: string;
   createdAt: string;
   updatedAt?: string;

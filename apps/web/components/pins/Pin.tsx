@@ -7,13 +7,16 @@ import type { PinWithSnippet } from "@/lib/requests/PinRequests";
 export const Pin = ({ pin }: { pin: PinWithSnippet }) => {
   const timeCreated = timeAgo(pin.createdAt);
   const openEditPin = useModalStore((s) => s.openEditPin);
+  const isProcessing = pin.status === "PROCESSING";
+  const tagLabel = isProcessing ? "Processing..." : (pin.category ?? "Other");
+  const tagColor = isProcessing ? "bg-yellow-300" : "bg-[#C77DFF]";
   return (
     <div className="group relative w-full border-[3px] border-black bg-white p-5 pt-5">
-      {/* Purple tag */}
-      <div className="absolute -top-3 left-4 flex items-center gap-1.5 border-2 border-black bg-[#C77DFF] px-2 py-0.5">
+      {/* Status tag */}
+      <div className={`absolute -top-3 left-4 flex items-center gap-1.5 border-2 border-black ${tagColor} px-2 py-0.5`}>
         <div className="h-2 w-2 rounded-sm bg-black" />
         <Typography variant="small" className="text-xs font-semibold">
-          ENG
+          {tagLabel}
         </Typography>
       </div>
 
@@ -25,7 +28,10 @@ export const Pin = ({ pin }: { pin: PinWithSnippet }) => {
               {pin.title}
             </Typography>
             <a href={pin.link} target="_blank" rel="noreferrer">
-              <Typography variant="muted" className="mt-1 line-clamp-2 break-all underline">
+              <Typography
+                variant="muted"
+                className="mt-1 line-clamp-2 break-all underline"
+              >
                 {cleanURL(pin.link)}
               </Typography>
             </a>
@@ -37,7 +43,7 @@ export const Pin = ({ pin }: { pin: PinWithSnippet }) => {
               {timeCreated}
             </Typography>
             <button
-              className="hidden cursor-pointer rounded p-1 hover:bg-gray-100 group-hover:block"
+              className="hidden cursor-pointer rounded p-1 group-hover:block hover:bg-gray-100"
               onClick={() => openEditPin(pin)}
             >
               <Ellipsis className="h-4 w-4" />

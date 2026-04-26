@@ -16,6 +16,7 @@ export async function GET() {
   const pins = await prisma.pin.findMany({
     where: {
       userId: session.user.id,
+      archivedAt: null,
       createdAt: { gte: startDate },
     },
     select: { createdAt: true },

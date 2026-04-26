@@ -19,7 +19,7 @@ export async function GET(request: Request) {
   }
 
   const pins = await prisma.pin.findMany({
-    where: { userId: session.user.id },
+    where: { userId: session.user.id, archivedAt: null },
     orderBy: { id: "desc" },
   });
 

@@ -33,6 +33,7 @@ export const PinStream = () => {
   const { data: fetchedPins } = useSWR<PinWithSnippet[]>(
     swrKey,
     PinRequests.list,
+    { refreshInterval: 5000 },
   );
 
   const [timedOut, setTimedOut] = useState(false);

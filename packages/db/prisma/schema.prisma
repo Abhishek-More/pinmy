@@ -86,6 +86,8 @@ model Pin {
   link        String
   description String?
   category    String     @default("Other")
+  status      String     @default("PROCESSING")
+  archivedAt  DateTime?  @map("archived_at")
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   User        User       @relation(fields: [userId], references: [id])

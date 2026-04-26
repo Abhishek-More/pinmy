@@ -14,7 +14,7 @@ export async function GET(
 
   const { id } = await ctx.params;
   const pin = await prisma.pin.findFirst({
-    where: { uniqueId: id, userId: session.user.id },
+    where: { uniqueId: id, userId: session.user.id, archivedAt: null },
   });
 
   if (!pin) {
@@ -45,7 +45,7 @@ export async function PUT(
   }
 
   const existing = await prisma.pin.findFirst({
-    where: { uniqueId: id, userId: session.user.id },
+    where: { uniqueId: id, userId: session.user.id, archivedAt: null },
   });
 
   if (!existing) {
@@ -71,14 +71,17 @@ export async function DELETE(
 
   const { id } = await ctx.params;
   const existing = await prisma.pin.findFirst({
-    where: { uniqueId: id, userId: session.user.id },
+    where: { uniqueId: id, userId: session.user.id, archivedAt: null },
   });
 
   if (!existing) {
     return Response.json({ error: "pin not found" }, { status: 404 });
   }
 
-  await prisma.pin.delete({ where: { uniqueId: id } });
+  await prisma.pin.update({
+    where: { uniqueId: id },
+    data: { archivedAt: new Date() },
+  });
 
   return new Response(null, { status: 204 });
 }
