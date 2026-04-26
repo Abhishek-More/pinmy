@@ -1,6 +1,0 @@
-{
-  "buildCommand": "pnpm db:generate && cd apps/web && next build",
-  "outputDirectory": "apps/web/.next",
-  "installCommand": "pnpm install --filter=@pinmy/web",
-  "framework": "nextjs"
-}

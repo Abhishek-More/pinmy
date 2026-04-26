@@ -1,0 +1,28 @@
+
+
+> @pinmy/web@0.1.0 build /Users/abhishekmore/Code/pinmy/apps/web
+> next build
+
+[1m[38;2;173;127;168m▲ Next.js 16.2.4[39m[22m (Turbopack)
+- Environments: .env
+
+[37m[1m [22m[39m Creating an optimized production build ...
+[32m[1m✓[22m[39m Compiled successfully in 2.0s
+[?25l[37m[1m [22m[39m Running TypeScript  [36m.[39m[2K[1G[37m[1m [22m[39m Running TypeScript  [36m..[39m[2K[1G[37m[1m [22m[39m Running TypeScript  [36m...[39m[2K[1G[37m[1m [22m[39m Running TypeScript  [36m.[39m[2K[1G[37m[1m [22m[39m Running TypeScript  [36m..[39m[2K[1G[37m[1m [22m[39m Running TypeScript  [36m...[39m[2K[1G[37m[1m [22m[39m Running TypeScript  [36m.[39m[2K[1G[37m[1m [22m[39m Running TypeScript  [36m..[39m[2K[1G[37m[1m [22m[39m Running TypeScript  [36m...[39m[2K[1G[37m[1m [22m[39m Running TypeScript  [36m.[39m[2K[1G[37m[1m [22m[39m Running TypeScript  [36m..[39m[2K[1G[37m[1m [22m[39m Running TypeScript  [36m...[39m[2K[1G[?25h[?25l[37m[1m [22m[39m Finished TypeScript in 2.3s  [36m.[39m[2K[1G[?25h[37m[1m [22m[39m Finished TypeScript in 2.3s    [32m[1m✓[22m[39m Finished TypeScript in 2.3s 
+[?25l[37m[1m [22m[39m Collecting page data using 9 workers  [36m.[39m[2K[1G[?25h[37m[1m [22m[39m Collecting page data using 9 workers in 193ms    [32m[1m✓[22m[39m Collecting page data using 9 workers in 193ms 
+[?25l[37m[1m [22m[39m Generating static pages using 9 workers (0/6)  [36m[    ][39m[2K[1G[37m[1m [22m[39m Generating static pages using 9 workers (2/6)  [36m[=   ][39m[2K[1G[?25h[32m[1m✓[22m[39m Generating static pages using 9 workers (6/6) in 217ms
+[?25l[37m[1m [22m[39m Finalizing page optimization  [36m.[39m[2K[1G[?25h[37m[1m [22m[39m Finalizing page optimization in 2ms    [32m[1m✓[22m[39m Finalizing page optimization in 2ms 
+
+[4mRoute (app)[24m
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/auth/[...all]
+├ ƒ /api/pins
+├ ƒ /api/pins/[id]
+└ ƒ /api/pins/weekly
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+[?25h
