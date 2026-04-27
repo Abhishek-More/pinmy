@@ -1,41 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { CATEGORIES, type Category } from "@pinmy/config";
 
 const client = new Anthropic();
-
-const CATEGORIES = [
-  "Engineering",
-  "Design",
-  "Research",
-  "Finance",
-  "News",
-  "Personal",
-  "Notes",
-  "Health",
-  "Legal",
-  "Marketing",
-  "Product",
-  "Career",
-  "Travel",
-  "Food",
-  "Real Estate",
-  "Sports",
-  "Politics",
-  "Science",
-  "History",
-  "Philosophy",
-  "Art",
-  "Music",
-  "Gaming",
-  "Crypto",
-  "AI",
-  "Security",
-  "Business",
-  "Education",
-  "Environment",
-  "Other",
-] as const;
-
-export type Category = (typeof CATEGORIES)[number];
 
 export async function classifyPin(
   title: string,

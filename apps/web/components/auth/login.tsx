@@ -178,7 +178,7 @@ export function Login() {
   if (isPending || session) return null;
 
   return (
-    <div className="brutal-shadow flex w-[300px] flex-col gap-2 border-2 border-black bg-white px-4 pt-4 pb-5">
+    <div className="brutal-shadow flex w-full max-w-[300px] flex-col gap-2 border-2 border-black bg-white px-4 pt-4 pb-5">
       <>
         <LoginHeader step={step} />
         {step === "phone" && <PhoneStep onSubmit={handlePhoneSubmit} />}

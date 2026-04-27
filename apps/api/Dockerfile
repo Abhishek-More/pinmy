@@ -5,10 +5,12 @@ RUN npm install -g pnpm@9
 WORKDIR /app
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY packages/db/ packages/db/
+COPY packages/config/package.json packages/config/
 COPY packages/queue/package.json packages/queue/
 COPY apps/api/package.json apps/api/
 RUN pnpm install --frozen-lockfile
 
+COPY packages/config packages/config
 COPY packages/queue packages/queue
 COPY apps/api apps/api
 

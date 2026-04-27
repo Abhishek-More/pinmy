@@ -9,6 +9,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.91.1",
     "@hono/node-server": "^1.19.14",
+    "@pinmy/config": "workspace:*",
     "@pinmy/db": "workspace:*",
     "@pinmy/queue": "workspace:*",
     "hono": "^4.12.15",

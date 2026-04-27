@@ -13,18 +13,38 @@ export default function Home() {
   const openCreatePin = useModalStore((s) => s.openCreatePin);
   return (
     <div className="mx-auto grid h-screen max-w-[2500px] grid-cols-12 overflow-hidden">
-      <div className="absolute top-16 right-16 flex items-center gap-4">
+      {/* Desktop login — hidden on mobile */}
+      <div className="absolute top-16 right-16 hidden items-center gap-4 md:flex">
         <Login />
       </div>
+
+      {/* Left sidebar — hidden on mobile */}
       <div className="hidden h-full max-w-11/12 flex-col border-r-2 border-black/10 md:col-span-4 md:flex lg:col-span-3">
         <LeftSidebar />
       </div>
-      <div className="col-span-12 flex flex-col items-center px-8 pt-16 md:col-span-8 lg:col-span-9 xl:col-span-6">
+
+      {/* Main content */}
+      <div className="col-span-12 flex flex-col items-center overflow-y-auto px-4 pt-6 pb-8 md:col-span-8 md:px-8 md:pt-16 lg:col-span-9 xl:col-span-6">
+        {/* Mobile header */}
+        <div className="mb-6 flex w-full items-center justify-between md:hidden">
+          <div className="flex items-baseline">
+            <Typography variant="h1">Pin</Typography>
+            <Typography
+              variant="h1"
+              as="span"
+              className="bg-accent border-2 border-black px-1"
+            >
+              My
+            </Typography>
+          </div>
+          <Login />
+        </div>
+
         <Search />
-        <div className="mt-12 mb-8 flex w-full justify-between">
+        <div className="mt-8 mb-6 flex w-full items-center justify-between md:mt-12 md:mb-8">
           <Typography variant="h1">Your Pins</Typography>
           <div className="brutal-shadow-accent-wrapper">
-            <Button onClick={openCreatePin} className="text-accent cursor-pointer border-2 border-black p-4 font-semibold">
+            <Button onClick={openCreatePin} className="text-accent cursor-pointer border-2 border-black p-3 font-semibold md:p-4">
               <Typography>+ NEW PIN</Typography>
             </Button>
           </div>

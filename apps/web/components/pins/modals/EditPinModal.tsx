@@ -64,8 +64,8 @@ export const EditPinModal = () => {
       open={!!editPin}
       onClose={closeEditPin}
       disabled={loading}
-      tag="Editing · ENG"
-      tagColor="#C77DFF"
+      tag="Editing"
+      tagColor="#55EFC4"
       title="Edit Pin"
       titleRight={
         <Typography variant="detail">

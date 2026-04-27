@@ -8,7 +8,7 @@ export const EmptyState = () => {
   const openCreatePin = useModalStore((s) => s.openCreatePin);
 
   return (
-    <div className="relative w-full border-[3px] border-black bg-white p-8">
+    <div className="relative w-full border-[3px] border-black bg-white p-5 sm:p-8">
       {/* Tag */}
       <div className="absolute -top-3 left-4 flex items-center gap-1.5 border-2 border-black bg-[#ffd800] px-2 py-0.5">
         <Star className="h-3 w-3" />
@@ -20,7 +20,8 @@ export const EmptyState = () => {
         No pins yet...
       </Typography>
       <Typography className="mt-2 text-sm text-black/70">
-        Save any links that you want to keep for later —<br />
+        Save any links that you want to keep for later —
+        <br className="hidden sm:block" />
         We'll process them so you can search through them with any keywords.
       </Typography>
 
@@ -28,8 +29,8 @@ export const EmptyState = () => {
         Two ways to get started:
       </Typography>
 
-      {/* Two columns */}
-      <div className="mt-6 grid grid-cols-[1fr_auto_1fr] gap-0">
+      {/* Two columns — stacks on mobile */}
+      <div className="mt-6 flex flex-col gap-6 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-0">
         {/* Column 01 — QR */}
         <div className="relative border-[3px] border-black p-5">
           <div className="absolute -top-2.5 right-3 border border-black bg-[#55EFC4] px-1.5 py-0.5 text-[10px] font-bold tracking-wide uppercase">
@@ -50,13 +51,13 @@ export const EmptyState = () => {
           </div>
         </div>
 
-        {/* OR divider */}
-        <div className="flex flex-col items-center justify-center px-4">
-          <div className="h-full w-px bg-black/10" />
-          <Typography variant="label" className="my-3 font-bold text-black/40">
+        {/* OR divider — horizontal on mobile, vertical on desktop */}
+        <div className="flex items-center justify-center gap-3 sm:flex-col sm:px-4">
+          <div className="h-px flex-1 bg-black/10 sm:h-full sm:w-px sm:flex-1" />
+          <Typography variant="label" className="font-bold text-black/40">
             Or
           </Typography>
-          <div className="h-full w-px bg-black/10" />
+          <div className="h-px flex-1 bg-black/10 sm:h-full sm:w-px sm:flex-1" />
         </div>
 
         {/* Column 02 — New Pin */}
@@ -67,16 +68,8 @@ export const EmptyState = () => {
             <span className="bg-black px-1.5 py-0.5 text-xs font-bold text-[#ffd800]">
               + NEW PIN
             </span>{" "}
-            in the top-right to add your first link or note.
+            in the top-right to add your first link.
           </Typography>
-
-          <button onClick={openCreatePin} className="mt-6 cursor-pointer">
-            <div className="brutal-shadow-accent-wrapper">
-              <div className="flex items-center gap-2 border-2 border-black bg-black px-6 py-3 text-sm font-bold tracking-wide text-[#ffd800] uppercase">
-                + New Pin →
-              </div>
-            </div>
-          </button>
         </div>
       </div>
     </div>

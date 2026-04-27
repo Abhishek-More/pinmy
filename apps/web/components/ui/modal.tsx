@@ -73,7 +73,7 @@ function ModalRoot({
     <Dialog open={open} onOpenChange={(o) => !o && !disabled && onClose()}>
       <DialogContent
         showCloseButton={false}
-        className="max-w-lg border-[3px] border-black p-0 sm:max-w-lg"
+        className="mx-4 max-w-lg border-[3px] border-black p-0 sm:mx-auto sm:max-w-lg"
       >
         <div className="absolute -top-3 right-4 left-4 flex items-center justify-between">
           <div

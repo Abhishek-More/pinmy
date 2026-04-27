@@ -20,6 +20,9 @@ importers:
       '@hono/node-server':
         specifier: ^1.19.14
         version: 1.19.14(hono@4.12.15)
+      '@pinmy/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@pinmy/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -57,6 +60,9 @@ importers:
       '@opentelemetry/api':
         specifier: ^1.9.1
         version: 1.9.1
+      '@pinmy/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@pinmy/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -157,6 +163,12 @@ importers:
       tailwindcss:
         specifier: ^4.2.2
         version: 4.2.4
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/config:
+    devDependencies:
       typescript:
         specifier: ^5
         version: 5.9.3

@@ -37,38 +37,39 @@ import {
 } from "lucide-react";
 import { useModalStore } from "@/lib/stores/useModalStore";
 import type { PinWithSnippet } from "@/lib/requests/PinRequests";
+import type { Category } from "@pinmy/config";
 
-const TAG_CONFIG: Record<string, { color: string; icon: LucideIcon }> = {
-  Engineering: { color: "#C77DFF", icon: Code },
-  Design: { color: "#FF6B6B", icon: Palette },
-  Research: { color: "#4ECDC4", icon: FlaskConical },
-  Finance: { color: "#45B7D1", icon: DollarSign },
-  News: { color: "#96CEB4", icon: Newspaper },
+const TAG_CONFIG: Record<Category, { color: string; icon: LucideIcon }> = {
+  Engineering: { color: "#D4A0FF", icon: Code },
+  Design: { color: "#FFA0A0", icon: Palette },
+  Research: { color: "#7EEDE4", icon: FlaskConical },
+  Finance: { color: "#8AD4E8", icon: DollarSign },
+  News: { color: "#B8E6D0", icon: Newspaper },
   Personal: { color: "#FFEAA7", icon: User },
   Notes: { color: "#DFE6E9", icon: StickyNote },
-  Health: { color: "#55EFC4", icon: Heart },
-  Legal: { color: "#A29BFE", icon: Scale },
-  Marketing: { color: "#FD79A8", icon: Megaphone },
-  Product: { color: "#6C5CE7", icon: Package },
-  Career: { color: "#00B894", icon: Briefcase },
-  Travel: { color: "#81ECEC", icon: Plane },
-  Food: { color: "#FAB1A0", icon: UtensilsCrossed },
-  "Real Estate": { color: "#74B9FF", icon: Home },
-  Sports: { color: "#00CEC9", icon: Trophy },
-  Politics: { color: "#E17055", icon: Landmark },
-  Science: { color: "#0984E3", icon: Microscope },
-  History: { color: "#D4A574", icon: Clock },
-  Philosophy: { color: "#B2BEC3", icon: Brain },
-  Art: { color: "#E84393", icon: Brush },
-  Music: { color: "#A855F7", icon: Music },
-  Gaming: { color: "#22C55E", icon: Gamepad2 },
-  Crypto: { color: "#F59E0B", icon: Bitcoin },
-  AI: { color: "#06B6D4", icon: Bot },
-  Security: { color: "#EF4444", icon: Shield },
-  Business: { color: "#8B5CF6", icon: Building2 },
-  Education: { color: "#3B82F6", icon: GraduationCap },
-  Environment: { color: "#10B981", icon: Leaf },
-  Other: { color: "#94A3B8", icon: Tag },
+  Health: { color: "#80FFD4", icon: Heart },
+  Legal: { color: "#C4BFFF", icon: Scale },
+  Marketing: { color: "#FFB0CB", icon: Megaphone },
+  Product: { color: "#B8AFFE", icon: Package },
+  Career: { color: "#6EECC0", icon: Briefcase },
+  Travel: { color: "#A0F0F0", icon: Plane },
+  Food: { color: "#FFCABC", icon: UtensilsCrossed },
+  "Real Estate": { color: "#A4D0FF", icon: Home },
+  Sports: { color: "#7EE8E4", icon: Trophy },
+  Politics: { color: "#FFB09A", icon: Landmark },
+  Science: { color: "#8DC8F8", icon: Microscope },
+  History: { color: "#E8C9A0", icon: Clock },
+  Philosophy: { color: "#CDD5DB", icon: Brain },
+  Art: { color: "#FF8DC7", icon: Brush },
+  Music: { color: "#CBA4FF", icon: Music },
+  Gaming: { color: "#7EE8A0", icon: Gamepad2 },
+  Crypto: { color: "#FFC04D", icon: Bitcoin },
+  AI: { color: "#7DD8E8", icon: Bot },
+  Security: { color: "#FFA0A0", icon: Shield },
+  Business: { color: "#B8A4FF", icon: Building2 },
+  Education: { color: "#93B8FF", icon: GraduationCap },
+  Environment: { color: "#6EE8B0", icon: Leaf },
+  Other: { color: "#C0CCD8", icon: Tag },
 };
 
 const PROCESSING_CONFIG = { color: "#FBBF24", icon: Loader };
@@ -84,7 +85,7 @@ export const Pin = ({ pin }: { pin: PinWithSnippet }) => {
   const tagLabel = isProcessing ? "Processing..." : (pin.category ?? "Other");
   const { color: tagBg, icon: TagIcon } = isProcessing ? PROCESSING_CONFIG : getTagConfig(tagLabel);
   return (
-    <div className="group relative w-full border-[3px] border-black bg-white p-5 pt-5">
+    <div className="group relative w-full border-[3px] border-black bg-white p-4 pt-4 sm:p-5 sm:pt-5">
       {/* Status tag */}
       <div className="absolute -top-3 left-4 flex items-center gap-1.5 border-2 border-black px-2 py-0.5" style={{ backgroundColor: tagBg }}>
         <TagIcon className="h-3 w-3" />
