@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { cleanURL, timeAgo } from "@/lib/utils";
 import { Typography } from "../typography/Typography";
 import {
@@ -38,6 +39,7 @@ import {
 import { useModalStore } from "@/lib/stores/useModalStore";
 import type { PinWithSnippet } from "@/lib/requests/PinRequests";
 import { CATEGORY_COLORS, type Category } from "@pinmy/config";
+import { PixelThumbnail } from "./PixelThumbnail";
 
 const TAG_ICONS: Record<Category, LucideIcon> = {
   Engineering: Code,
@@ -84,13 +86,18 @@ function getTagConfig(category: string) {
 export const Pin = ({ pin }: { pin: PinWithSnippet }) => {
   const timeCreated = timeAgo(pin.createdAt);
   const openEditPin = useModalStore((s) => s.openEditPin);
+  const [hovered, setHovered] = useState(false);
   const isProcessing = pin.status === "PROCESSING";
   const tagLabel = isProcessing ? "Indexing..." : (pin.category ?? "Other");
   const { color: tagBg, icon: TagIcon } = isProcessing
     ? PROCESSING_CONFIG
     : getTagConfig(tagLabel);
   return (
-    <div className="group relative w-full border-[3px] border-black bg-white p-4 pt-4 sm:p-5 sm:pt-5">
+    <div
+      className="group relative w-full border-[3px] border-black bg-white p-4 pt-4 sm:p-5 sm:pt-5"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       {/* Status tag */}
       <div
         className="absolute -top-3 left-4 flex items-center gap-1.5 border-2 border-black px-2 py-0.5"
@@ -103,54 +110,49 @@ export const Pin = ({ pin }: { pin: PinWithSnippet }) => {
       </div>
 
       {/* Main content */}
-      <div className="flex min-w-0 flex-1 gap-4">
-        {pin.image && (
-          <div className="hidden shrink-0 sm:block">
-            <img
-              src={pin.image}
-              alt=""
-              className="h-16 w-16 rounded border-2 border-black object-cover"
-            />
-          </div>
-        )}
-        <div className="flex min-w-0 flex-1 flex-col">
-          <div className="flex items-center">
-            <div className="min-w-0 flex-1">
-              <Typography variant="large" className="line-clamp-2">
-                {pin.title}
-              </Typography>
-              <a href={pin.link} target="_blank" rel="noreferrer">
-                <Typography
-                  variant="muted"
-                  className="mt-1 truncate underline"
-                >
-                  {cleanURL(pin.link, 1)}
-                </Typography>
-              </a>
-            </div>
-
-            {/* Time / Menu */}
-            <div className="shrink-0 pl-4">
-              <Typography variant="muted" className="group-hover:hidden">
-                {timeCreated}
-              </Typography>
-              <button
-                className="hidden cursor-pointer rounded p-1 group-hover:block hover:bg-gray-100"
-                onClick={() => openEditPin(pin)}
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex items-center">
+          <div className="min-w-0 flex-1">
+            <Typography variant="large" className="line-clamp-2">
+              {pin.title}
+            </Typography>
+            <a href={pin.link} target="_blank" rel="noreferrer">
+              <Typography
+                variant="muted"
+                className="mt-1 truncate underline"
               >
-                <Ellipsis className="h-4 w-4" />
-              </button>
-            </div>
+                {cleanURL(pin.link, 1)}
+              </Typography>
+            </a>
           </div>
 
-          {/* Search snippet */}
-          {pin.snippet && (
-            <p
-              className="text-muted-foreground [&_mark]:text-foreground mt-3 border-l-[3px] border-black pl-3 text-sm leading-relaxed [&_mark]:bg-yellow-200 [&_mark]:px-0.5"
-              dangerouslySetInnerHTML={{ __html: pin.snippet }}
-            />
+          {pin.image && (
+            <div className="hidden shrink-0 pl-4 sm:block">
+              <PixelThumbnail src={pin.image} size={64} hovered={hovered} />
+            </div>
           )}
+
+          {/* Time / Menu — stacked to prevent layout shift */}
+          <div className="relative shrink-0 pl-4">
+            <Typography variant="muted" className="transition-opacity group-hover:opacity-0">
+              {timeCreated}
+            </Typography>
+            <button
+              className="absolute inset-0 flex cursor-pointer items-center justify-center rounded opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-100"
+              onClick={() => openEditPin(pin)}
+            >
+              <Ellipsis className="h-4 w-4" />
+            </button>
+          </div>
         </div>
+
+        {/* Search snippet */}
+        {pin.snippet && (
+          <p
+            className="text-muted-foreground [&_mark]:text-foreground mt-3 border-l-[3px] border-black pl-3 text-sm leading-relaxed [&_mark]:bg-yellow-200 [&_mark]:px-0.5"
+            dangerouslySetInnerHTML={{ __html: pin.snippet }}
+          />
+        )}
       </div>
     </div>
   );

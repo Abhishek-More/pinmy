@@ -130,6 +130,14 @@ body {
   position: relative;
 }
 
+@utility scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @utility brutal-shadow-accent-wrapper {
   position: relative;
   display: inline-block;

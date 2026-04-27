@@ -61,11 +61,16 @@ const CollectionsSection = () => {
       .sort((a, b) => b[1] - a[1])
       .map(([name, count]) => ({
         name,
-        color: CATEGORY_COLORS[name as keyof typeof CATEGORY_COLORS] ?? CATEGORY_COLORS["Other"],
+        color:
+          CATEGORY_COLORS[name as keyof typeof CATEGORY_COLORS] ??
+          CATEGORY_COLORS["Other"],
         count,
       }));
 
-    return [{ name: "ALL", color: null as string | null, count: totalCount }, ...categories];
+    return [
+      { name: "ALL", color: null as string | null, count: totalCount },
+      ...categories,
+    ];
   }, [pins]);
 
   const isSelected = (name: string) =>
@@ -81,7 +86,9 @@ const CollectionsSection = () => {
       {collections.map((col) => (
         <div
           key={col.name}
-          onClick={() => setSelectedCategory(col.name === "ALL" ? null : col.name)}
+          onClick={() =>
+            setSelectedCategory(col.name === "ALL" ? null : col.name)
+          }
           className={`mt-2 flex cursor-pointer items-center justify-between border-[3px] border-black p-3 first:mt-0 ${
             isSelected(col.name)
               ? "bg-black text-white"
@@ -91,7 +98,7 @@ const CollectionsSection = () => {
           <div className="flex items-center gap-2">
             {col.color && (
               <div
-                className="h-3 w-3 shrink-0 border border-black"
+                className="h-3 w-3 shrink-0 rounded-full border border-black"
                 style={{ backgroundColor: col.color }}
               />
             )}

@@ -24,7 +24,7 @@ export default function Home() {
       </div>
 
       {/* Main content */}
-      <div className="col-span-12 flex flex-col items-center overflow-y-auto px-4 pt-6 pb-8 md:col-span-8 md:px-8 md:pt-16 lg:col-span-9 xl:col-span-6">
+      <div className="col-span-12 flex h-screen flex-col items-center overflow-hidden px-4 pt-6 md:col-span-8 md:px-8 md:pt-16 lg:col-span-9 xl:col-span-6">
         {/* Mobile header */}
         <div className="mb-6 flex w-full items-center justify-between md:hidden">
           <div className="flex items-baseline">
@@ -41,15 +41,20 @@ export default function Home() {
         </div>
 
         <Search />
-        <div className="mt-8 mb-6 flex w-full items-center justify-between md:mt-12 md:mb-8">
+        <div className="mt-8 mb-6 flex w-full shrink-0 items-center justify-between md:mt-12 md:mb-8">
           <Typography variant="h1">Your Pins</Typography>
           <div className="brutal-shadow-accent-wrapper">
-            <Button onClick={openCreatePin} className="text-accent cursor-pointer border-2 border-black p-3 font-semibold md:p-4">
+            <Button
+              onClick={openCreatePin}
+              className="text-accent cursor-pointer border-2 border-black p-3 font-semibold md:p-4"
+            >
               <Typography>+ NEW PIN</Typography>
             </Button>
           </div>
         </div>
-        <PinStream />
+        <div className="mb-10 min-h-0 w-full flex-1 overflow-y-auto border-b-1 border-black/40 pb-8 scrollbar-hide">
+          <PinStream />
+        </div>
       </div>
 
       <RightSidebar />

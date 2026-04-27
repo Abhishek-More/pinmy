@@ -45,7 +45,7 @@ export async function scrapeLink(url: string) {
     const buffer = await response.arrayBuffer();
     html = new TextDecoder().decode(buffer.slice(0, MAX_HTML_SIZE));
   } catch (e) {
-    return { title: url, description: "", content: "", url };
+    return { title: url, description: "", image: "", content: "", url };
   } finally {
     clearTimeout(timeout);
   }

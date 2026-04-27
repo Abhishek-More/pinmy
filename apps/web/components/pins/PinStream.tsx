@@ -48,9 +48,10 @@ export const PinStream = () => {
 
   const isLoading = !timedOut && (isPending || (session?.user && !fetchedPins));
   const allPins = isLoading ? null : (fetchedPins ?? samplePins);
-  const pins = allPins && selectedCategory
-    ? allPins.filter((p) => (p.category ?? "Other") === selectedCategory)
-    : allPins;
+  const pins =
+    allPins && selectedCategory
+      ? allPins.filter((p) => (p.category ?? "Other") === selectedCategory)
+      : allPins;
   const [open, setOpen] = useState(false);
   const [link, setLink] = useState("");
   const [loading, setLoading] = useState(false);
@@ -78,7 +79,7 @@ export const PinStream = () => {
 
   return (
     <div className="w-full">
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 pt-4">
         {pins
           ? pins.length > 0
             ? pins.map((pin) => (
@@ -86,7 +87,9 @@ export const PinStream = () => {
                   <Pin pin={pin} />
                 </div>
               ))
-            : session?.user && !searchQuery && !selectedCategory && <EmptyState />
+            : session?.user &&
+              !searchQuery &&
+              !selectedCategory && <EmptyState />
           : Array.from({ length: 2 }).map((_, i) => (
               <PinSkeleton key={`skeleton-${i}`} />
             ))}

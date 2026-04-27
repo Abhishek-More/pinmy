@@ -11,14 +11,14 @@ const CELL = 12;
 const GAP = 3;
 const LABEL_WIDTH = 24;
 const PADDING = 20; // p-5 = 1.25rem = 20px
-const DOW_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
+const DOW_LABELS = ["", "MON", "", "WED", "", "FRI", ""];
 
 const INTENSITY_COLORS = [
-  "bg-white/10",
-  "bg-yellow-900",
-  "bg-yellow-700",
-  "bg-yellow-500",
+  "bg-black/5",
+  "bg-yellow-200",
   "bg-yellow-300",
+  "bg-yellow-400",
+  "bg-yellow-500",
 ];
 
 function getIntensity(count: number, max: number): number {
@@ -98,7 +98,7 @@ const ChartSkeleton = ({ cols }: { cols: number }) => (
           style={{ height: CELL }}
         >
           {label && (
-            <span className="pr-1 text-[9px] leading-none text-white/40">
+            <span className="pr-1 text-[9px] leading-none text-black/60">
               {label}
             </span>
           )}
@@ -111,7 +111,7 @@ const ChartSkeleton = ({ cols }: { cols: number }) => (
           {Array.from({ length: 7 }).map((_, r) => (
             <Skeleton
               key={r}
-              className="rounded-[2px] bg-white/10"
+              className="rounded-full bg-black/5"
               style={{ height: CELL, width: CELL }}
             />
           ))}
@@ -123,12 +123,11 @@ const ChartSkeleton = ({ cols }: { cols: number }) => (
 
 const Chart = ({ data }: { data: DayCount[] }) => {
   const gridRef = useRef<HTMLDivElement>(null);
-  const total = data.reduce((sum, d) => sum + d.count, 0);
   const max = Math.max(...data.map((d) => d.count), 1);
   const { grid, cols } = useMemo(() => buildGrid(data), [data]);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="mt-3 flex flex-col gap-4">
       <div className="flex" style={{ gap: GAP }}>
         {/* Day-of-week labels */}
         <div
@@ -142,7 +141,7 @@ const Chart = ({ data }: { data: DayCount[] }) => {
               style={{ height: CELL }}
             >
               {label && (
-                <span className="pr-1 text-[9px] leading-none text-white/40">
+                <span className="pr-1 text-[9px] leading-none text-black/60">
                   {label}
                 </span>
               )}
@@ -196,11 +195,11 @@ const Chart = ({ data }: { data: DayCount[] }) => {
                     }}
                   >
                     <div
-                      className={`h-full w-full rounded-[2px] border border-white/5 ${INTENSITY_COLORS[level]}`}
+                      className={`h-full w-full rounded-full border border-black/20 ${INTENSITY_COLORS[level]}`}
                     />
                     <div
                       data-tip
-                      className="pointer-events-none absolute z-10 rounded bg-white px-1.5 py-0.5 text-[10px] font-bold text-black shadow"
+                      className="pointer-events-none absolute z-10 rounded border border-black bg-white px-1.5 py-0.5 text-[10px] font-bold text-black shadow"
                       style={{
                         opacity: 0,
                         top: -28,
@@ -242,28 +241,30 @@ export const WeeklyPins = () => {
   return (
     <div
       ref={containerRef}
-      className="flex flex-col gap-4 overflow-hidden border-[3px] border-black bg-[#1a1a1a] p-5"
+      className="relative flex flex-col gap-4 border-[3px] border-black bg-white p-5"
     >
-      <div className="flex items-center justify-between">
-        <Typography variant="label" className="text-white/60">
-          ACTIVITY
-        </Typography>
-        <Typography variant="label" className="text-white/60">
-          {data ? data.reduce((sum, d) => sum + d.count, 0) : 0} Pins
-        </Typography>
+      {/* Tag */}
+      <div className="absolute -top-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 border-2 border-black bg-[#ffd800] px-2 py-0.5">
+        <div className="h-2 w-2 rounded-sm bg-black" />
+        <Typography variant="tag">Activity</Typography>
       </div>
       {isLoading ? <ChartSkeleton cols={cols} /> : <Chart data={data} />}
-      {/* Legend */}
-      <div className="flex items-center justify-end gap-1">
-        <span className="mr-1 text-[10px] text-white/40">Less</span>
-        {INTENSITY_COLORS.map((color, i) => (
-          <div
-            key={i}
-            className={`rounded-[2px] border border-white/5 ${color}`}
-            style={{ height: CELL - 2, width: CELL - 2 }}
-          />
-        ))}
-        <span className="ml-1 text-[10px] text-white/40">More</span>
+      {/* Footer */}
+      <div className="flex items-center justify-between">
+        <Typography variant="label" className="text-black/60">
+          {data ? data.reduce((sum, d) => sum + d.count, 0) : 0} Pins
+        </Typography>
+        <div className="flex items-center gap-1">
+          <span className="mr-1 text-xs font-medium text-black/60">LESS</span>
+          {INTENSITY_COLORS.map((color, i) => (
+            <div
+              key={i}
+              className={`rounded-full border border-black/10 ${color}`}
+              style={{ height: CELL - 2, width: CELL - 2 }}
+            />
+          ))}
+          <span className="ml-1 text-xs font-medium text-black/60">MORE</span>
+        </div>
       </div>
     </div>
   );
