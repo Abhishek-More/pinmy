@@ -15,10 +15,10 @@ const DOW_LABELS = ["", "MON", "", "WED", "", "FRI", ""];
 
 const INTENSITY_COLORS = [
   "bg-black/5",
-  "bg-yellow-200",
-  "bg-yellow-300",
-  "bg-yellow-400",
-  "bg-yellow-500",
+  "bg-teal-200",
+  "bg-teal-300",
+  "bg-teal-400",
+  "bg-teal-500",
 ];
 
 function getIntensity(count: number, max: number): number {
