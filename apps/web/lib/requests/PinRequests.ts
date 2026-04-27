@@ -7,6 +7,7 @@ export interface Pin {
   title: string;
   link: string;
   description?: string | null;
+  image?: string | null;
   category?: string;
   status: string;
   platform: string;
@@ -21,7 +22,8 @@ export interface PinWithSnippet extends Pin {
 }
 
 export interface DayCount {
-  day: string;
+  date: string;
+  dow: number;
   count: number;
 }
 
@@ -70,6 +72,6 @@ export const PinRequests = {
     await revalidate();
   },
 
-  weekly: (): Promise<DayCount[]> =>
-    fetch(`${BASE}/weekly`).then((res) => handleResponse<DayCount[]>(res)),
+  weekly: (key: string): Promise<DayCount[]> =>
+    fetch(key).then((res) => handleResponse<DayCount[]>(res)),
 };

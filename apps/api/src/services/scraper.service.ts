@@ -63,7 +63,14 @@ export async function scrapeLink(url: string) {
     /<meta[^>]+content=["']([^"']+)["'][^>]+name=["']description["']/i,
   ]);
 
+  const image = extractMeta(html, [
+    /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i,
+    /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i,
+    /<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i,
+    /<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image["']/i,
+  ]);
+
   const content = extractText(html);
 
-  return { title, description, content, url };
+  return { title, description, image, content, url };
 }

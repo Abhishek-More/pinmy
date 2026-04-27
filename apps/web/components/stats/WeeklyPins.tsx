@@ -1,68 +1,237 @@
 "use client";
 
+import { useMemo, useRef, useState, useEffect } from "react";
 import { Typography } from "../typography/Typography";
 import { Skeleton } from "@/components/ui/skeleton";
 import useSWR from "swr";
 import { authClient } from "@/lib/clients/auth-browser";
 import { PinRequests, type DayCount } from "@/lib/requests/PinRequests";
 
-const SKELETON_DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
-const SKELETON_HEIGHTS = [32, 16, 8, 48, 24, 6, 12];
+const CELL = 12;
+const GAP = 3;
+const LABEL_WIDTH = 24;
+const PADDING = 20; // p-5 = 1.25rem = 20px
+const DOW_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
 
-const WeeklyPinsSkeleton = () => (
-  <>
-    <Skeleton className="h-10 w-16 bg-white/10" />
-    <div className="flex items-end justify-between gap-2" style={{ height: 80 }}>
-      {SKELETON_DAYS.map((day, i) => (
-        <div key={day} className="flex flex-1 flex-col items-center gap-1">
-          <Skeleton
-            className="w-full bg-white/10"
-            style={{ height: SKELETON_HEIGHTS[i] }}
-          />
-          <span className="text-[10px] font-medium text-white/50">{day}</span>
+const INTENSITY_COLORS = [
+  "bg-white/10",
+  "bg-yellow-900",
+  "bg-yellow-700",
+  "bg-yellow-500",
+  "bg-yellow-300",
+];
+
+function getIntensity(count: number, max: number): number {
+  if (count === 0) return 0;
+  if (max <= 0) return 1;
+  const ratio = count / max;
+  if (ratio <= 0.25) return 1;
+  if (ratio <= 0.5) return 2;
+  if (ratio <= 0.75) return 3;
+  return 4;
+}
+
+function buildGrid(data: DayCount[]) {
+  const first = data[0];
+  if (!first) return { grid: [] as (DayCount | null)[][], cols: 0 };
+
+  const startDow = first.dow;
+  const totalSlots = startDow + data.length;
+  const cols = Math.ceil(totalSlots / 7);
+
+  const grid: (DayCount | null)[][] = Array.from({ length: 7 }, () =>
+    Array(cols).fill(null),
+  );
+
+  let col = 0;
+  let row = startDow;
+  for (const day of data) {
+    grid[row][col] = day;
+    row++;
+    if (row >= 7) {
+      row = 0;
+      col++;
+    }
+  }
+
+  return { grid, cols };
+}
+
+function useCols(containerRef: React.RefObject<HTMLDivElement | null>) {
+  const [cols, setCols] = useState(0);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const measure = () => {
+      const available = el.clientWidth - PADDING * 2 - LABEL_WIDTH - GAP - CELL;
+      setCols(Math.max(Math.floor((available + GAP) / (CELL + GAP)), 4));
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [containerRef]);
+
+  return cols;
+}
+
+function colsToDays(cols: number) {
+  // We need enough days to fill `cols` columns.
+  // Last column ends on today (Saturday = dow 6 at most).
+  // Extra days for the partial first column are handled by the grid builder.
+  return cols * 7;
+}
+
+const ChartSkeleton = ({ cols }: { cols: number }) => (
+  <div className="flex" style={{ gap: GAP }}>
+    <div
+      className="flex shrink-0 flex-col"
+      style={{ width: LABEL_WIDTH, gap: GAP }}
+    >
+      {DOW_LABELS.map((label, i) => (
+        <div
+          key={i}
+          className="flex items-center justify-end"
+          style={{ height: CELL }}
+        >
+          {label && (
+            <span className="pr-1 text-[9px] leading-none text-white/40">
+              {label}
+            </span>
+          )}
         </div>
       ))}
     </div>
-  </>
+    <div className="flex" style={{ gap: GAP }}>
+      {Array.from({ length: Math.max(cols, 4) }).map((_, c) => (
+        <div key={c} className="flex flex-col" style={{ gap: GAP }}>
+          {Array.from({ length: 7 }).map((_, r) => (
+            <Skeleton
+              key={r}
+              className="rounded-[2px] bg-white/10"
+              style={{ height: CELL, width: CELL }}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
 );
 
-const WeeklyPinsChart = ({ data }: { data: DayCount[] }) => {
+const Chart = ({ data }: { data: DayCount[] }) => {
+  const gridRef = useRef<HTMLDivElement>(null);
   const total = data.reduce((sum, d) => sum + d.count, 0);
   const max = Math.max(...data.map((d) => d.count), 1);
+  const { grid, cols } = useMemo(() => buildGrid(data), [data]);
 
   return (
-    <>
-      <div className="flex items-baseline gap-2">
-        <span className="text-4xl font-bold text-white">{total}</span>
-        <span className="text-lg text-white/50">pins</span>
-      </div>
-      <div className="flex items-end justify-between gap-2" style={{ height: 80 }}>
-        {data.map((d) => (
-          <div key={d.day} className="group flex flex-1 flex-col items-center gap-1">
-            <span className="text-[10px] font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
-              {d.count}
-            </span>
+    <div className="flex flex-col gap-3">
+      <div className="flex" style={{ gap: GAP }}>
+        {/* Day-of-week labels */}
+        <div
+          className="flex shrink-0 flex-col"
+          style={{ width: LABEL_WIDTH, gap: GAP }}
+        >
+          {DOW_LABELS.map((label, i) => (
             <div
-              className="bg-accent w-full"
-              style={{
-                height: d.count > 0 ? Math.max((d.count / max) * 64, 4) : 2,
-                opacity: d.count > 0 ? 1 : 0.3,
-              }}
-            />
-            <span className="text-[10px] font-medium text-white/50">
-              {d.day}
-            </span>
-          </div>
-        ))}
+              key={i}
+              className="flex items-center justify-end"
+              style={{ height: CELL }}
+            >
+              {label && (
+                <span className="pr-1 text-[9px] leading-none text-white/40">
+                  {label}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Grid */}
+        <div ref={gridRef} className="flex" style={{ gap: GAP }}>
+          {Array.from({ length: cols }).map((_, c) => (
+            <div key={c} className="flex flex-col" style={{ gap: GAP }}>
+              {grid.map((row, r) => {
+                const cell = row[c];
+                if (!cell) {
+                  return <div key={r} style={{ height: CELL, width: CELL }} />;
+                }
+                const level = getIntensity(cell.count, max);
+                return (
+                  <div
+                    key={r}
+                    className="relative"
+                    style={{ height: CELL, width: CELL }}
+                    onMouseEnter={(e) => {
+                      const tip =
+                        e.currentTarget.querySelector<HTMLElement>(
+                          "[data-tip]",
+                        );
+                      const gridEl = gridRef.current;
+                      if (!tip || !gridEl) return;
+                      tip.style.left = `${CELL / 2}px`;
+                      tip.style.transform = "translateX(-50%)";
+                      tip.style.opacity = "1";
+                      requestAnimationFrame(() => {
+                        const tipRect = tip.getBoundingClientRect();
+                        const gridRect = gridEl.getBoundingClientRect();
+                        const overRight = tipRect.right - gridRect.right;
+                        const overLeft = gridRect.left - tipRect.left;
+                        if (overRight > 0) {
+                          tip.style.left = `${CELL / 2 - overRight}px`;
+                        } else if (overLeft > 0) {
+                          tip.style.left = `${CELL / 2 + overLeft}px`;
+                        }
+                      });
+                    }}
+                    onMouseLeave={(e) => {
+                      const tip =
+                        e.currentTarget.querySelector<HTMLElement>(
+                          "[data-tip]",
+                        );
+                      if (tip) tip.style.opacity = "0";
+                    }}
+                  >
+                    <div
+                      className={`h-full w-full rounded-[2px] border border-white/5 ${INTENSITY_COLORS[level]}`}
+                    />
+                    <div
+                      data-tip
+                      className="pointer-events-none absolute z-10 rounded bg-white px-1.5 py-0.5 text-[10px] font-bold text-black shadow"
+                      style={{
+                        opacity: 0,
+                        top: -28,
+                        left: CELL / 2,
+                        transform: "translateX(-50%)",
+                        transition: "opacity 0.15s",
+                        width: "max-content",
+                      }}
+                    >
+                      {cell.count} pin{cell.count !== 1 ? "s" : ""} ·{" "}
+                      {cell.date.slice(5)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 
 export const WeeklyPins = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const cols = useCols(containerRef);
+  const days = colsToDays(cols);
+
   const { data: session, isPending } = authClient.useSession();
   const { data } = useSWR<DayCount[]>(
-    session?.user ? "/api/pins/weekly" : null,
+    session?.user && cols > 0 ? `/api/pins/weekly?days=${days}` : null,
     PinRequests.weekly,
   );
 
@@ -71,11 +240,31 @@ export const WeeklyPins = () => {
   const isLoading = isPending || !data;
 
   return (
-    <div className="flex flex-col gap-4 border-[3px] border-black bg-[#1a1a1a] p-5">
-      <Typography variant="label" className="text-white/60">
-        Last 7 Days
-      </Typography>
-      {isLoading ? <WeeklyPinsSkeleton /> : <WeeklyPinsChart data={data} />}
+    <div
+      ref={containerRef}
+      className="flex flex-col gap-4 overflow-hidden border-[3px] border-black bg-[#1a1a1a] p-5"
+    >
+      <div className="flex items-center justify-between">
+        <Typography variant="label" className="text-white/60">
+          ACTIVITY
+        </Typography>
+        <Typography variant="label" className="text-white/60">
+          {data ? data.reduce((sum, d) => sum + d.count, 0) : 0} Pins
+        </Typography>
+      </div>
+      {isLoading ? <ChartSkeleton cols={cols} /> : <Chart data={data} />}
+      {/* Legend */}
+      <div className="flex items-center justify-end gap-1">
+        <span className="mr-1 text-[10px] text-white/40">Less</span>
+        {INTENSITY_COLORS.map((color, i) => (
+          <div
+            key={i}
+            className={`rounded-[2px] border border-white/5 ${color}`}
+            style={{ height: CELL - 2, width: CELL - 2 }}
+          />
+        ))}
+        <span className="ml-1 text-[10px] text-white/40">More</span>
+      </div>
     </div>
   );
 };

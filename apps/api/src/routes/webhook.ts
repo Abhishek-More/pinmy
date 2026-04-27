@@ -55,6 +55,7 @@ webhook.post("/twilio", async (c) => {
       title: scraped.title,
       link,
       description: scraped.description || null,
+      image: scraped.image || null,
       status: "PROCESSING",
       platform: "sms",
       userId: user.id,
@@ -93,7 +94,7 @@ webhook.post("/process", async (c) => {
 
   const updatedPin = await prisma.pin.update({
     where: { id: pin.id },
-    data: { category, status: "READY" },
+    data: { category, image: scraped.image || null, status: "READY" },
   });
 
   return c.json({ status: "created", pin: updatedPin }, 201);
