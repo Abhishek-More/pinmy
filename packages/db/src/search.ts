@@ -8,6 +8,7 @@ export interface SearchResult {
   description: string | null;
   category: string | null;
   status: string;
+  platform: string;
   userId: string;
   createdAt: string;
   relevance: number;
@@ -43,6 +44,7 @@ export async function searchPins(
         p.description,
         p.category,
         p.status,
+        p.platform,
         p."userId",
         p."createdAt",
         ts_rank_cd(p.tsv, to_tsquery('english', $1), 32) AS relevance,
@@ -61,6 +63,7 @@ export async function searchPins(
         p.description,
         p.category,
         p.status,
+        p.platform,
         p."userId",
         p."createdAt",
         ts_rank_cd(pc.tsv, to_tsquery('english', $1), 32) AS relevance,
@@ -90,12 +93,13 @@ export async function searchPins(
       description,
       category,
       status,
+      platform,
       "userId",
       "createdAt",
       MAX(relevance) AS relevance,
       MAX(snippet) AS snippet
     FROM combined
-    GROUP BY id, "uniqueId", title, link, description, category, status, "userId", "createdAt"
+    GROUP BY id, "uniqueId", title, link, description, category, status, platform, "userId", "createdAt"
     ORDER BY relevance DESC
     LIMIT 50
     `,

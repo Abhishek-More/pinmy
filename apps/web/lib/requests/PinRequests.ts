@@ -9,6 +9,7 @@ export interface Pin {
   description?: string | null;
   category?: string;
   status: string;
+  platform: string;
   userId: string;
   createdAt: string;
   updatedAt?: string;

@@ -25,12 +25,12 @@ export const EmptyState = () => {
         We'll process them so you can search through them with any keywords.
       </Typography>
 
-      <Typography className="mt-2 text-sm font-semibold text-black">
+      <Typography className="mt-4 text-sm font-semibold text-black">
         Two ways to get started:
       </Typography>
 
       {/* Two columns — stacks on mobile */}
-      <div className="mt-6 flex flex-col gap-6 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-0">
+      <div className="mt-4 flex flex-col gap-6 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-0">
         {/* Column 01 — QR */}
         <div className="relative border-[3px] border-black p-5">
           <div className="absolute -top-2.5 right-3 border border-black bg-[#55EFC4] px-1.5 py-0.5 text-[10px] font-bold tracking-wide uppercase">

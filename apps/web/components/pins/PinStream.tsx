@@ -23,6 +23,7 @@ import { usePinStore } from "@/lib/stores/usePinStore";
 
 export const PinStream = () => {
   const searchQuery = usePinStore((s) => s.searchQuery);
+  const selectedCategory = usePinStore((s) => s.selectedCategory);
   const { data: session, isPending } = authClient.useSession();
 
   const swrKey = session?.user
@@ -46,7 +47,10 @@ export const PinStream = () => {
   }, [isPending]);
 
   const isLoading = !timedOut && (isPending || (session?.user && !fetchedPins));
-  const pins = isLoading ? null : (fetchedPins ?? samplePins);
+  const allPins = isLoading ? null : (fetchedPins ?? samplePins);
+  const pins = allPins && selectedCategory
+    ? allPins.filter((p) => (p.category ?? "Other") === selectedCategory)
+    : allPins;
   const [open, setOpen] = useState(false);
   const [link, setLink] = useState("");
   const [loading, setLoading] = useState(false);
@@ -82,7 +86,7 @@ export const PinStream = () => {
                   <Pin pin={pin} />
                 </div>
               ))
-            : session?.user && <EmptyState />
+            : session?.user && !searchQuery && !selectedCategory && <EmptyState />
           : Array.from({ length: 2 }).map((_, i) => (
               <PinSkeleton key={`skeleton-${i}`} />
             ))}

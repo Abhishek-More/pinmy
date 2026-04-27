@@ -87,6 +87,7 @@ model Pin {
   description String?
   category    String     @default("Other")
   status      String     @default("PROCESSING")
+  platform    String     @default("web")
   archivedAt  DateTime?  @map("archived_at")
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt

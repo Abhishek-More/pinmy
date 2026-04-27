@@ -56,6 +56,7 @@ webhook.post("/twilio", async (c) => {
       link,
       description: scraped.description || null,
       status: "PROCESSING",
+      platform: "sms",
       userId: user.id,
     },
   });

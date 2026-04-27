@@ -1,6 +1,6 @@
 export function chunkText(
   text: string,
-  size = 5000,
+  size = 1000,
 ): { sequence: number; content: string }[] {
   const trimmed = text?.trim();
   if (!trimmed) return [];

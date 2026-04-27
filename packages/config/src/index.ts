@@ -32,3 +32,36 @@ export const CATEGORIES = [
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];
+
+export const CATEGORY_COLORS: Record<Category, string> = {
+  Engineering: "#D4A0FF",
+  Design: "#FFA0A0",
+  Research: "#7EEDE4",
+  Finance: "#8AD4E8",
+  News: "#B8E6D0",
+  Personal: "#FFEAA7",
+  Notes: "#DFE6E9",
+  Health: "#80FFD4",
+  Legal: "#C4BFFF",
+  Marketing: "#FFB0CB",
+  Product: "#B8AFFE",
+  Career: "#6EECC0",
+  Travel: "#A0F0F0",
+  Food: "#FFCABC",
+  "Real Estate": "#A4D0FF",
+  Sports: "#7EE8E4",
+  Politics: "#FFB09A",
+  Science: "#8DC8F8",
+  History: "#E8C9A0",
+  Philosophy: "#CDD5DB",
+  Art: "#FF8DC7",
+  Music: "#CBA4FF",
+  Gaming: "#7EE8A0",
+  Crypto: "#FFC04D",
+  AI: "#7DD8E8",
+  Security: "#FFA0A0",
+  Business: "#B8A4FF",
+  Education: "#93B8FF",
+  Environment: "#6EE8B0",
+  Other: "#C0CCD8",
+};

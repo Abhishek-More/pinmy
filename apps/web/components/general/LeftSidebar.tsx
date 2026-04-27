@@ -7,6 +7,9 @@ import useSWR from "swr";
 import { PinRequests } from "@/lib/requests/PinRequests";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Identicon } from "./Identicon";
+import { CATEGORY_COLORS } from "@pinmy/config";
+import { useMemo } from "react";
+import { usePinStore } from "@/lib/stores/usePinStore";
 
 const ProfileSection = () => {
   const { data: session, isPending } = authClient.useSession();
@@ -43,13 +46,30 @@ const CollectionsSection = () => {
     session?.user ? "/api/pins" : null,
     PinRequests.list,
   );
+  const selectedCategory = usePinStore((s) => s.selectedCategory);
+  const setSelectedCategory = usePinStore((s) => s.setSelectedCategory);
 
-  const totalCount = pins?.length ?? 0;
+  const collections = useMemo(() => {
+    const totalCount = pins?.length ?? 0;
+    const counts: Record<string, number> = {};
+    for (const pin of pins ?? []) {
+      const cat = pin.category ?? "Other";
+      counts[cat] = (counts[cat] ?? 0) + 1;
+    }
 
-  const collections = [
-    { name: "ALL", color: null, count: totalCount },
-    { name: "ENG", color: "#C77DFF", count: 0 },
-  ];
+    const categories = Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, count]) => ({
+        name,
+        color: CATEGORY_COLORS[name as keyof typeof CATEGORY_COLORS] ?? CATEGORY_COLORS["Other"],
+        count,
+      }));
+
+    return [{ name: "ALL", color: null as string | null, count: totalCount }, ...categories];
+  }, [pins]);
+
+  const isSelected = (name: string) =>
+    name === "ALL" ? selectedCategory === null : selectedCategory === name;
 
   return (
     <div className="flex flex-col gap-0">
@@ -61,8 +81,9 @@ const CollectionsSection = () => {
       {collections.map((col) => (
         <div
           key={col.name}
-          className={`-mt-[3px] flex cursor-pointer items-center justify-between border-[3px] border-black p-3 first:mt-0 ${
-            col.name === "ALL"
+          onClick={() => setSelectedCategory(col.name === "ALL" ? null : col.name)}
+          className={`mt-2 flex cursor-pointer items-center justify-between border-[3px] border-black p-3 first:mt-0 ${
+            isSelected(col.name)
               ? "bg-black text-white"
               : "bg-white hover:bg-gray-50"
           }`}
@@ -70,7 +91,7 @@ const CollectionsSection = () => {
           <div className="flex items-center gap-2">
             {col.color && (
               <div
-                className="h-3 w-3 border border-black"
+                className="h-3 w-3 shrink-0 border border-black"
                 style={{ backgroundColor: col.color }}
               />
             )}
