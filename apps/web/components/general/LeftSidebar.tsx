@@ -38,7 +38,10 @@ const ProfileSection = () => {
         <Typography className="font-semibold">{phone}</Typography>
       </div>
       <button
-        onClick={async () => { await authClient.signOut(); router.push("/login"); }}
+        onClick={async () => {
+          await authClient.signOut();
+          router.push("/login");
+        }}
         className="cursor-pointer p-1 hover:bg-gray-100"
         title="Sign out"
       >
@@ -85,36 +88,38 @@ const CollectionsSection = () => {
     name === "ALL" ? selectedCategory === null : selectedCategory === name;
 
   return (
-    <div className="flex flex-col gap-0">
-      <div className="mb-3 flex w-1/2 items-center gap-2">
+    <div className="flex min-h-0 flex-1 flex-col gap-0">
+      <div className="mb-3 flex w-1/2 shrink-0 items-center gap-2">
         <div className="h-px flex-1 bg-black/20" />
         <Typography variant="label">Collections</Typography>
         <div className="h-px flex-1 bg-black/20" />
       </div>
-      {collections.map((col) => (
-        <div
-          key={col.name}
-          onClick={() =>
-            setSelectedCategory(col.name === "ALL" ? null : col.name)
-          }
-          className={`mt-2 flex cursor-pointer items-center justify-between border-[3px] border-black p-3 first:mt-0 ${
-            isSelected(col.name)
-              ? "bg-black text-white"
-              : "bg-white hover:bg-gray-50"
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            {col.color && (
-              <div
-                className="h-3 w-3 shrink-0 rounded-full border border-black"
-                style={{ backgroundColor: col.color }}
-              />
-            )}
-            <Typography className="text-sm font-bold">{col.name}</Typography>
+      <div className="scrollbar-hide overflow-y-auto border">
+        {collections.map((col) => (
+          <div
+            key={col.name}
+            onClick={() =>
+              setSelectedCategory(col.name === "ALL" ? null : col.name)
+            }
+            className={`mt-2 flex cursor-pointer items-center justify-between border-[3px] border-black p-3 first:mt-0 ${
+              isSelected(col.name)
+                ? "bg-black text-white"
+                : "bg-white hover:bg-gray-50"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              {col.color && (
+                <div
+                  className="h-3 w-3 shrink-0 rounded-full border border-black"
+                  style={{ backgroundColor: col.color }}
+                />
+              )}
+              <Typography className="text-sm font-bold">{col.name}</Typography>
+            </div>
+            <Typography className="text-sm">{col.count}</Typography>
           </div>
-          <Typography className="text-sm">{col.count}</Typography>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { Star } from "lucide-react";
+import { Download, Star } from "lucide-react";
 import { Typography } from "../typography/Typography";
 import { useModalStore } from "@/lib/stores/useModalStore";
 
@@ -37,17 +37,29 @@ export const EmptyState = () => {
             Recommended
           </div>
           <Typography variant="display">01</Typography>
-          <Typography className="mt-3 text-sm">
+          <Typography className="mt-3 hidden text-sm sm:block">
             Scan the QR with your phone to save PinMy directly to your contacts.
-            Just text PinMy a link and we'll save it for you.
+            Just text PinMy a link and we&apos;ll save it for you.
+          </Typography>
+          <Typography className="mt-3 text-sm sm:hidden">
+            Tap the button below to add PinMy to your contacts.
+            Then just text us a link and we&apos;ll save it for you.
           </Typography>
 
           <div className="flex flex-col items-center gap-3 p-4">
             <img
               src="/pinmy-contact-qr.svg"
               alt="Scan to add PinMy to contacts"
-              className="h-40 w-40 border-3 border-black"
+              className="hidden h-40 w-40 border-3 border-black sm:block"
             />
+            <a
+              href="/pinmy.vcf"
+              download="PinMy.vcf"
+              className="flex w-full items-center justify-center gap-2 border-2 border-black bg-[#ffd800] px-4 py-3 text-xs font-bold uppercase tracking-wider hover:bg-[#e6c200] sm:hidden"
+            >
+              <Download className="h-3.5 w-3.5" />
+              Save PinMy to Contacts
+            </a>
           </div>
         </div>
 
