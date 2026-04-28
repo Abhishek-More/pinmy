@@ -24,8 +24,6 @@ const DEMO_PINS: PinWithSnippet[] = [
     platform: "web",
     userId: "",
     createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    snippet:
-      "April 16. As part of this investigation, we ran more ablations (removing lines from the <mark>system prompt</mark>) to understand the impact of each line) using a broader set of evaluations.",
   },
   {
     id: 2,
@@ -37,8 +35,6 @@ const DEMO_PINS: PinWithSnippet[] = [
     platform: "web",
     userId: "",
     createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-    snippet:
-      "Variance is not noise. We measured cross-run drift across 12k <mark>system prompt</mark> permutations and surfaced three load-bearing factors.",
   },
   {
     id: 3,
@@ -72,21 +68,6 @@ const DEMO_PINS: PinWithSnippet[] = [
     platform: "web",
     userId: "",
     createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    snippet:
-      "Use <mark>system prompt</mark> as a runbook header \u2014 it forces consistency between staging dry-runs and prod execution.",
-  },
-  {
-    id: 6,
-    uniqueId: "demo_6",
-    title: "Note: ideas for the Q3 brand refresh",
-    link: "https://pinmy.app/notes/q3-brand",
-    category: "Notes",
-    status: "DONE",
-    platform: "web",
-    userId: "",
-    createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-    snippet:
-      "1. lean into the brutal grid 2. fewer corners, more weight 3. stickers as a primary affordance, not a flourish.",
   },
   {
     id: 7,
@@ -301,7 +282,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex h-screen flex-col md:flex-row">
+    <div className="flex h-screen flex-col overflow-hidden md:flex-row">
       {/* ── Left: Form (desktop) / Bottom sheet (mobile) ── */}
       <div className="order-2 flex shrink-0 flex-col border-t-[3px] border-black bg-[#f4f1e8] md:order-1 md:w-[420px] md:border-t-0 md:border-r-[3px] lg:w-[480px]">
         <div className="flex flex-1 flex-col px-6 py-8 md:px-12 md:pt-12">
@@ -322,16 +303,13 @@ export default function LoginPage() {
           <div className="mb-auto" />
 
           {/* Sign-in tag */}
-          <div className="mb-4 inline-flex w-fit items-center gap-1.5 border-2 border-black bg-black px-2 py-0.5">
+          <div className="mb-4 hidden w-fit items-center gap-1.5 border-2 border-black bg-black px-2 py-0.5 md:inline-flex">
             <span className="text-[10px] text-white">&#9733;</span>
             <Typography variant="small" className="font-bold text-white">
               SIGN IN
             </Typography>
           </div>
 
-          <Typography variant="h1" className="mb-2 text-2xl md:text-3xl">
-            Welcome back.
-          </Typography>
           <Typography variant="muted" className="mb-8">
             Enter your number &mdash; we&apos;ll send
             <br />a one-time code. No password needed.
@@ -370,7 +348,7 @@ export default function LoginPage() {
           {step === "otp" && <OtpInput onVerify={handleVerify} />}
 
           {/* Color dots + stat */}
-          <div className="mt-8 flex items-center gap-2">
+          <div className="mt-8 hidden items-center gap-2 md:flex">
             {[
               "#D4A0FF",
               "#FFC04D",
@@ -411,18 +389,22 @@ export default function LoginPage() {
       </div>
 
       {/* ── Right: Pin stream ── */}
-      <div className="order-1 min-h-0 flex-1 overflow-y-auto bg-[#f4f1e8] px-4 py-6 md:order-2 md:px-10 md:py-12 lg:px-16">
-        <Typography
-          variant="muted"
-          className="mb-6 text-xs tracking-widest uppercase"
-        >
-          // YOUR PINS
-        </Typography>
-        <div className="flex flex-col gap-4 pt-2">
-          {DEMO_PINS.map((pin) => (
-            <Pin key={pin.uniqueId} pin={pin} />
-          ))}
+      <div className="relative order-1 min-h-0 flex-1 md:order-2">
+        <div className="h-full overflow-hidden bg-[#e8e4db] px-4 py-6 md:overflow-y-auto md:px-10 md:py-12 lg:px-16">
+          <Typography
+            variant="muted"
+            className="mb-6 text-xs tracking-widest uppercase"
+          >
+            // YOUR PINS
+          </Typography>
+          <div className="flex flex-col gap-4 pt-2">
+            {DEMO_PINS.map((pin) => (
+              <Pin key={pin.uniqueId} pin={pin} />
+            ))}
+          </div>
         </div>
+        {/* Bottom fade on mobile */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#e8e4db] to-transparent md:hidden" />
       </div>
     </div>
   );

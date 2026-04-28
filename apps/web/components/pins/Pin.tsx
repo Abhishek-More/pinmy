@@ -39,7 +39,6 @@ import {
 import { useModalStore } from "@/lib/stores/useModalStore";
 import type { PinWithSnippet } from "@/lib/requests/PinRequests";
 import { CATEGORY_COLORS, type Category } from "@pinmy/config";
-import { PixelThumbnail } from "./PixelThumbnail";
 import { GenerativeThumbnail } from "./GenerativeThumbnail";
 
 const TAG_ICONS: Record<Category, LucideIcon> = {
@@ -115,11 +114,7 @@ export const Pin = ({ pin }: { pin: PinWithSnippet }) => {
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-center">
           <div className="hidden shrink-0 sm:block">
-            {pin.image ? (
-              <PixelThumbnail src={pin.image} size={64} hovered={hovered} />
-            ) : (
-              <GenerativeThumbnail seed={pin.uniqueId} size={64} hovered={hovered} />
-            )}
+            <GenerativeThumbnail seed={pin.uniqueId} link={pin.link} size={64} hovered={hovered} />
           </div>
 
           <div className="min-w-0 flex-1 pl-4">
