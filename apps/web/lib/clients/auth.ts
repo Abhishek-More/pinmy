@@ -52,10 +52,12 @@ export const auth = betterAuth({
         getTempEmail: (phoneNumber) => `${phoneNumber.replace(/\D/g, "")}@phone.local`,
       },
       sendOTP: async ({ phoneNumber }) => {
+        console.log("[auth] sendOTP phoneNumber:", phoneNumber);
         const { sendVerificationCode } = await getTwilioService();
         await sendVerificationCode(phoneNumber);
       },
       verifyOTP: async ({ phoneNumber, code }) => {
+        console.log("[auth] verifyOTP phoneNumber:", phoneNumber, "code:", code);
         const { verifyCode } = await getTwilioService();
         return verifyCode(phoneNumber, code);
       },

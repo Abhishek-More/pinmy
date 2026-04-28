@@ -150,7 +150,7 @@ function PhoneInput({
             if (error) setError(false);
           }}
           onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-          className="min-w-0 flex-1 bg-transparent px-3 py-2 text-sm font-medium outline-none placeholder:text-gray-400"
+          className="min-w-0 flex-1 bg-transparent px-3 py-2 text-base font-medium outline-none placeholder:text-gray-400"
         />
         {phone.length > 0 && (
           <button
@@ -180,11 +180,24 @@ function OtpInput({ onVerify }: { onVerify: (code: string) => void }) {
   const refs = { current: new Array<HTMLInputElement | null>(6).fill(null) };
 
   const handleChange = (index: number, value: string) => {
-    if (!/^\d?$/.test(value)) return;
+    const cleaned = value.replace(/\D/g, "");
+
+    // iOS autofill pastes the full code into onChange
+    if (cleaned.length > 1) {
+      const code = cleaned.slice(0, 6);
+      const next = Array(6).fill("");
+      for (let i = 0; i < code.length; i++) next[i] = code[i];
+      setDigits(next);
+      refs.current[Math.min(code.length, 5)]?.focus();
+      if (code.length === 6) onVerify(code);
+      return;
+    }
+
+    if (!/^\d?$/.test(cleaned)) return;
     const next = [...digits];
-    next[index] = value;
+    next[index] = cleaned;
     setDigits(next);
-    if (value && index < 5) refs.current[index + 1]?.focus();
+    if (cleaned && index < 5) refs.current[index + 1]?.focus();
   };
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
@@ -224,11 +237,12 @@ function OtpInput({ onVerify }: { onVerify: (code: string) => void }) {
             }}
             type="text"
             inputMode="numeric"
-            maxLength={1}
+            autoComplete={i === 0 ? "one-time-code" : "off"}
+            maxLength={i === 0 ? 6 : 1}
             value={digit}
             onChange={(e) => handleChange(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
-            className="h-10 w-10 px-0 text-center text-sm font-bold"
+            className="h-10 w-10 px-0 text-center text-base font-bold"
           />
         ))}
       </div>
@@ -282,19 +296,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden md:flex-row">
+    <div className="flex h-screen flex-col overflow-hidden lg:flex-row">
       {/* ── Left: Form (desktop) / Bottom sheet (mobile) ── */}
-      <div className="order-2 flex shrink-0 flex-col border-t-[3px] border-black bg-[#f4f1e8] md:order-1 md:w-[420px] md:border-t-0 md:border-r-[3px] lg:w-[480px]">
-        <div className="flex flex-1 flex-col px-6 py-8 md:px-12 md:pt-12">
+      <div className="order-2 flex shrink-0 flex-col border-t-[3px] border-black bg-[#f4f1e8] lg:order-1 lg:w-[420px] lg:w-[480px] lg:border-t-0 lg:border-r-[3px]">
+        <div className="flex flex-1 flex-col px-6 py-8 lg:px-12 lg:pt-12">
           {/* Logo */}
           <div className="mb-1 flex items-baseline">
-            <Typography variant="display" className="text-4xl md:text-5xl">
+            <Typography variant="display" className="text-4xl lg:text-5xl">
               Pin
             </Typography>
             <Typography
               variant="display"
               as="span"
-              className="border-2 border-black bg-[#ffd800] px-1 text-4xl md:text-5xl"
+              className="border-2 border-black bg-[#ffd800] px-1 text-4xl lg:text-5xl"
             >
               My
             </Typography>
@@ -303,14 +317,14 @@ export default function LoginPage() {
           <div className="mb-auto" />
 
           {/* Sign-in tag */}
-          <div className="mb-4 hidden w-fit items-center gap-1.5 border-2 border-black bg-black px-2 py-0.5 md:inline-flex">
+          <div className="mb-4 hidden w-fit items-center gap-1.5 border-2 border-black bg-black px-2 py-0.5 lg:inline-flex">
             <span className="text-[10px] text-white">&#9733;</span>
             <Typography variant="small" className="font-bold text-white">
               SIGN IN
             </Typography>
           </div>
 
-          <Typography variant="muted" className="mb-8">
+          <Typography variant="muted" className="mt-2 mb-8">
             Enter your number &mdash; we&apos;ll send
             <br />a one-time code. No password needed.
           </Typography>
@@ -348,7 +362,7 @@ export default function LoginPage() {
           {step === "otp" && <OtpInput onVerify={handleVerify} />}
 
           {/* Color dots + stat */}
-          <div className="mt-8 hidden items-center gap-2 md:flex">
+          <div className="mt-8 hidden items-center gap-2 lg:flex">
             {[
               "#D4A0FF",
               "#FFC04D",
@@ -370,7 +384,7 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 md:px-12">
+        <div className="flex items-center justify-between px-6 py-4 lg:px-12">
           <Typography variant="detail">PINMY &middot; 2026</Typography>
           <div className="flex items-center gap-3">
             <Link href="/privacy">
@@ -389,8 +403,8 @@ export default function LoginPage() {
       </div>
 
       {/* ── Right: Pin stream ── */}
-      <div className="relative order-1 min-h-0 flex-1 md:order-2">
-        <div className="h-full overflow-hidden bg-[#e8e4db] px-4 py-6 md:overflow-y-auto md:px-10 md:py-12 lg:px-16">
+      <div className="relative order-1 min-h-0 flex-1 lg:order-2">
+        <div className="h-full overflow-hidden bg-[#e8e4db] px-4 py-6 lg:overflow-y-auto lg:px-10 lg:px-16 lg:py-12">
           <Typography
             variant="muted"
             className="mb-6 text-xs tracking-widest uppercase"
@@ -404,7 +418,7 @@ export default function LoginPage() {
           </div>
         </div>
         {/* Bottom fade on mobile */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#e8e4db] to-transparent md:hidden" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[#e8e4db] to-transparent lg:hidden" />
       </div>
     </div>
   );

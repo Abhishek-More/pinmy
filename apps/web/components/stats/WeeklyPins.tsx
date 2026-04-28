@@ -57,6 +57,8 @@ function buildGrid(data: DayCount[]) {
   return { grid, cols };
 }
 
+const FETCH_DAYS = 130;
+
 function useCols(containerRef: React.RefObject<HTMLDivElement | null>) {
   const [cols, setCols] = useState(0);
 
@@ -78,11 +80,10 @@ function useCols(containerRef: React.RefObject<HTMLDivElement | null>) {
   return cols;
 }
 
-function colsToDays(cols: number) {
-  // We need enough days to fill `cols` columns.
-  // Last column ends on today (Saturday = dow 6 at most).
-  // Extra days for the partial first column are handled by the grid builder.
-  return cols * 7;
+function sliceToFit(data: DayCount[], cols: number): DayCount[] {
+  const maxDays = cols * 7;
+  if (data.length <= maxDays) return data;
+  return data.slice(data.length - maxDays);
 }
 
 const ChartSkeleton = ({ cols }: { cols: number }) => (
@@ -226,12 +227,16 @@ const Chart = ({ data }: { data: DayCount[] }) => {
 export const WeeklyPins = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const cols = useCols(containerRef);
-  const days = colsToDays(cols);
 
   const { data: session, isPending } = authClient.useSession();
-  const { data } = useSWR<DayCount[]>(
-    session?.user && cols > 0 ? `/api/pins/weekly?days=${days}` : null,
+  const { data: allData } = useSWR<DayCount[]>(
+    session?.user ? `/api/pins/weekly?days=${FETCH_DAYS}` : null,
     PinRequests.weekly,
+  );
+
+  const data = useMemo(
+    () => (allData && cols > 0 ? sliceToFit(allData, cols) : null),
+    [allData, cols],
   );
 
   if (!isPending && !session?.user) return null;
