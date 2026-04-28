@@ -46,7 +46,7 @@ export const Search = () => {
         <Input
           ref={inputRef}
           placeholder="Search titles, texts, anything"
-          className="border-none px-0 focus-visible:border-none focus-visible:ring-0"
+          className="border-none px-0 text-base focus-visible:border-none focus-visible:ring-0"
           onChange={(e) => handleChange(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Escape") {
