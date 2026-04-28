@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Login } from "@/components/auth/login";
 import { PinStream } from "@/components/pins/PinStream";
 import { Search } from "@/components/pins/Search";
@@ -8,9 +10,18 @@ import { Button } from "@/components/ui/button";
 import { useModalStore } from "@/lib/stores/useModalStore";
 import { LeftSidebar } from "@/components/general/LeftSidebar";
 import { RightSidebar } from "@/components/general/RightSidebar";
+import { authClient } from "@/lib/clients/auth-browser";
 
 export default function Home() {
   const openCreatePin = useModalStore((s) => s.openCreatePin);
+  const { data: session, isPending } = authClient.useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isPending && !session) {
+      router.replace("/login");
+    }
+  }, [isPending, session, router]);
   return (
     <div className="mx-auto grid h-screen max-w-[2500px] grid-cols-12 overflow-hidden">
       {/* Desktop login — hidden on mobile */}

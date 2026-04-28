@@ -287,10 +287,8 @@ export default function LoginPage() {
       phoneNumber: formatPhone(phone),
       code,
     });
-    console.log("[login] verify response:", JSON.stringify(res));
     if (res.error) {
       setStep("phone");
-      console.log("[login] verify error:", res.error);
       return;
     }
     closeAll();

@@ -14,13 +14,16 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // better-auth stores session in a cookie named "better-auth.session_token"
   const sessionToken =
     request.cookies.get("better-auth.session_token")?.value;
 
   if (!sessionToken) {
-    const loginUrl = new URL("/login", request.url);
-    return NextResponse.redirect(loginUrl);
+    // For RSC/fetch requests (client-side navigation), return 401 instead of redirect
+    // so the client can handle it gracefully
+    if (request.headers.get("rsc") || request.headers.get("next-router-state-tree")) {
+      return NextResponse.next();
+    }
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();
