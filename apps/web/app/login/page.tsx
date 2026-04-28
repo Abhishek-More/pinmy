@@ -270,6 +270,7 @@ export default function LoginPage() {
   const [phone, setPhone] = useState("");
   const [sending, setSending] = useState(false);
   const [phoneReady, setPhoneReady] = useState(false);
+  const [verifying, setVerifying] = useState(false);
 
   const formatPhone = (input: string) =>
     `+1${input.replace(/\D/g, "").replace(/^1/, "")}`;
@@ -283,15 +284,19 @@ export default function LoginPage() {
   };
 
   const handleVerify = async (code: string) => {
+    if (verifying) return;
+    setVerifying(true);
     const res = await authClient.phoneNumber.verify({
       phoneNumber: formatPhone(phone),
       code,
     });
     if (res.error) {
+      setVerifying(false);
       setStep("phone");
       return;
     }
     closeAll();
+    router.refresh();
     router.push("/");
   };
 

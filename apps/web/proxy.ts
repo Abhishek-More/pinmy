@@ -5,7 +5,6 @@ const PUBLIC_PATHS = ["/login", "/api/auth", "/privacy", "/terms"];
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow public paths and static assets
   if (
     PUBLIC_PATHS.some((p) => pathname.startsWith(p)) ||
     pathname.startsWith("/_next") ||
@@ -14,15 +13,19 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Skip auth check for client-side navigations (RSC requests)
+  // — the cookie may not be available yet after login
+  const isRsc =
+    request.headers.has("rsc") ||
+    request.headers.has("next-router-state-tree");
+  if (isRsc) {
+    return NextResponse.next();
+  }
+
   const sessionToken =
     request.cookies.get("better-auth.session_token")?.value;
 
   if (!sessionToken) {
-    // For RSC/fetch requests (client-side navigation), return 401 instead of redirect
-    // so the client can handle it gracefully
-    if (request.headers.get("rsc") || request.headers.get("next-router-state-tree")) {
-      return NextResponse.next();
-    }
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
