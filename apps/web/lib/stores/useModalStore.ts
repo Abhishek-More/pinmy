@@ -8,6 +8,7 @@ interface ModalStore {
   createPinOpen: boolean;
   openCreatePin: () => void;
   closeCreatePin: () => void;
+  closeAll: () => void;
 }
 
 export const useModalStore = create<ModalStore>((set) => ({
@@ -17,4 +18,5 @@ export const useModalStore = create<ModalStore>((set) => ({
   createPinOpen: false,
   openCreatePin: () => set({ createPinOpen: true }),
   closeCreatePin: () => set({ createPinOpen: false }),
+  closeAll: () => set({ editPin: null, createPinOpen: false }),
 }));

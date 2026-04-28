@@ -40,6 +40,7 @@ import { useModalStore } from "@/lib/stores/useModalStore";
 import type { PinWithSnippet } from "@/lib/requests/PinRequests";
 import { CATEGORY_COLORS, type Category } from "@pinmy/config";
 import { PixelThumbnail } from "./PixelThumbnail";
+import { GenerativeThumbnail } from "./GenerativeThumbnail";
 
 const TAG_ICONS: Record<Category, LucideIcon> = {
   Engineering: Code,
@@ -94,9 +95,10 @@ export const Pin = ({ pin }: { pin: PinWithSnippet }) => {
     : getTagConfig(tagLabel);
   return (
     <div
-      className="group relative w-full border-[3px] border-black bg-white p-4 pt-4 sm:p-5 sm:pt-5"
+      className="group relative w-full cursor-pointer border-[3px] border-black bg-white p-4 pt-4 sm:p-5 sm:pt-5"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={() => window.open(pin.link, "_blank", "noopener,noreferrer")}
     >
       {/* Status tag */}
       <div
@@ -112,34 +114,37 @@ export const Pin = ({ pin }: { pin: PinWithSnippet }) => {
       {/* Main content */}
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-center">
-          <div className="min-w-0 flex-1">
+          <div className="hidden shrink-0 sm:block">
+            {pin.image ? (
+              <PixelThumbnail src={pin.image} size={64} hovered={hovered} />
+            ) : (
+              <GenerativeThumbnail seed={pin.uniqueId} size={64} hovered={hovered} />
+            )}
+          </div>
+
+          <div className="min-w-0 flex-1 pl-4">
             <Typography variant="large" className="line-clamp-2">
               {pin.title}
             </Typography>
-            <a href={pin.link} target="_blank" rel="noreferrer">
-              <Typography
-                variant="muted"
-                className="mt-1 truncate underline"
-              >
-                {cleanURL(pin.link, 1)}
-              </Typography>
-            </a>
+            <Typography variant="muted" className="mt-1 truncate">
+              {cleanURL(pin.link, 1)}
+            </Typography>
           </div>
-
-          {pin.image && (
-            <div className="hidden shrink-0 pl-4 sm:block">
-              <PixelThumbnail src={pin.image} size={64} hovered={hovered} />
-            </div>
-          )}
 
           {/* Time / Menu — stacked to prevent layout shift */}
           <div className="relative shrink-0 pl-4">
-            <Typography variant="muted" className="transition-opacity group-hover:opacity-0">
+            <Typography
+              variant="muted"
+              className="transition-opacity group-hover:opacity-0"
+            >
               {timeCreated}
             </Typography>
             <button
               className="absolute inset-0 flex cursor-pointer items-center justify-center rounded opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-100"
-              onClick={() => openEditPin(pin)}
+              onClick={(e) => {
+                e.stopPropagation();
+                openEditPin(pin);
+              }}
             >
               <Ellipsis className="h-4 w-4" />
             </button>
