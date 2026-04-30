@@ -22,8 +22,9 @@ export default function Home() {
       router.replace("/login");
     }
   }, [isPending, session, router]);
+
   return (
-    <div className="mx-auto grid h-screen max-w-[2500px] grid-cols-12 overflow-hidden">
+    <div className="mx-auto grid h-dvh max-w-[2500px] grid-cols-12 overflow-hidden">
       {/* Desktop login — hidden on mobile */}
       <div className="absolute top-16 right-16 hidden items-center gap-4 md:flex">
         <Login />
@@ -35,7 +36,7 @@ export default function Home() {
       </div>
 
       {/* Main content */}
-      <div className="col-span-12 flex h-screen flex-col items-center overflow-hidden px-4 pt-6 md:col-span-8 md:px-8 md:pt-16 lg:col-span-9 xl:col-span-6">
+      <div className="col-span-12 flex h-dvh flex-col items-center overflow-hidden px-4 pt-6 md:col-span-8 md:px-8 md:pt-16 lg:col-span-9 xl:col-span-6">
         {/* Mobile header */}
         <div className="mb-6 flex w-full items-center justify-between md:hidden">
           <div className="flex items-baseline">
@@ -63,7 +64,7 @@ export default function Home() {
             </Button>
           </div>
         </div>
-        <div className="mb-10 min-h-0 w-full flex-1 overflow-y-auto border-b-1 border-black/40 pb-8 scrollbar-hide">
+        <div className="scrollbar-hide mb-10 min-h-0 w-full flex-1 overflow-y-auto border-b-1 border-black/40 pb-8">
           <PinStream />
         </div>
       </div>

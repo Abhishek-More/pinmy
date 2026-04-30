@@ -301,7 +301,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden lg:flex-row">
+    <div className="flex h-dvh flex-col overflow-hidden lg:flex-row">
       {/* ── Left: Form (desktop) / Bottom sheet (mobile) ── */}
       <div className="order-2 flex shrink-0 flex-col border-t-[3px] border-black bg-[#f4f1e8] lg:order-1 lg:w-[420px] lg:w-[480px] lg:border-t-0 lg:border-r-[3px]">
         <div className="flex flex-1 flex-col px-6 py-8 lg:px-12 lg:pt-12">
