@@ -7,11 +7,75 @@ import { authClient } from "@/lib/clients/auth-browser";
 import { Typography } from "@/components/typography/Typography";
 import { Button } from "@/components/ui/button";
 import { Identicon } from "@/components/general/Identicon";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 interface KeyData {
   key: string;
   prefix: string;
   createdAt: string;
+}
+
+const LANGUAGES = ["cURL", "JavaScript", "Python", "Go", "Ruby"] as const;
+type Language = (typeof LANGUAGES)[number];
+
+const BASE_PATH = "/api/v1/pins";
+
+function snippet(lang: Language, origin: string): string {
+  const url = `${origin}${BASE_PATH}`;
+  switch (lang) {
+    case "cURL":
+      return `curl -H "Authorization: Bearer pm_YOUR_KEY" \\
+  "${url}"`;
+    case "JavaScript":
+      return `const res = await fetch("${url}", {
+  headers: { Authorization: "Bearer pm_YOUR_KEY" },
+});
+const { data } = await res.json();`;
+    case "Python":
+      return `import requests
+
+res = requests.get(
+    "${url}",
+    headers={"Authorization": "Bearer pm_YOUR_KEY"},
+)
+data = res.json()["data"]`;
+    case "Go":
+      return `req, _ := http.NewRequest("GET", "${url}", nil)
+req.Header.Set("Authorization", "Bearer pm_YOUR_KEY")
+resp, _ := http.DefaultClient.Do(req)`;
+    case "Ruby":
+      return `require "net/http"
+require "json"
+
+uri = URI("${url}")
+req = Net::HTTP::Get.new(uri)
+req["Authorization"] = "Bearer pm_YOUR_KEY"
+res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }
+data = JSON.parse(res.body)["data"]`;
+  }
+}
+
+function UsageSnippets() {
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+
+  return (
+    <Tabs defaultValue="cURL">
+      <TabsList variant="line" className="mb-3 gap-0">
+        {LANGUAGES.map((lang) => (
+          <TabsTrigger key={lang} value={lang} className="px-3 py-1.5 text-xs font-semibold">
+            {lang}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+      {LANGUAGES.map((lang) => (
+        <TabsContent key={lang} value={lang}>
+          <pre className="overflow-x-auto border-2 border-black bg-gray-950 px-4 py-4 font-mono text-xs text-green-400">
+            {snippet(lang, origin)}
+          </pre>
+        </TabsContent>
+      ))}
+    </Tabs>
+  );
 }
 
 export default function ProfilePage() {
@@ -202,15 +266,12 @@ export default function ProfilePage() {
       </div>
 
       {/* Usage example */}
-      <div className="mt-8 border-[3px] border-black bg-white">
+      <div className="mt-8 mb-12 border-[3px] border-black bg-white">
         <div className="border-b-[3px] border-black px-5 py-4">
           <Typography variant="large">Usage</Typography>
         </div>
         <div className="px-5 py-5">
-          <pre className="overflow-x-auto border-2 border-black bg-gray-950 px-4 py-4 font-mono text-xs text-green-400">
-{`curl -H "Authorization: Bearer pm_YOUR_KEY" \\
-  ${typeof window !== "undefined" ? window.location.origin : ""}/api/v1/pins`}
-          </pre>
+          <UsageSnippets />
           <div className="mt-4 flex flex-col gap-2">
             <Typography variant="detail">Query parameters:</Typography>
             <ul className="list-inside list-disc text-xs text-muted-foreground">
