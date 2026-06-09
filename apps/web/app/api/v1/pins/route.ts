@@ -1,4 +1,4 @@
-import { resolveApiKey } from "@/lib/clients/api-key";
+import { resolveApiKey } from "@/features/key/key.service";
 import { prisma } from "@/lib/clients/prisma";
 import { searchPins } from "@pinmy/db";
 

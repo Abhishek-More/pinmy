@@ -4,7 +4,7 @@ import {
   createApiKey,
   getApiKeyMeta,
   revokeApiKey,
-} from "@/lib/clients/api-key";
+} from "@/features/key/key.service";
 
 async function getSession() {
   return auth.api.getSession({ headers: await headers() });
