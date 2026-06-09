@@ -1,5 +1,5 @@
 import { randomBytes, createHash } from "node:crypto";
-import { prisma } from "./prisma";
+import { prisma } from "@/lib/clients/prisma";
 
 const PREFIX_LENGTH = 8;
 
@@ -24,17 +24,17 @@ export async function createApiKey(userId: string): Promise<{
 
   const { raw, hash, prefix } = generateRawKey();
   const record = await prisma.apiKey.create({
-    data: { userId, keyHash: hash, prefix },
+    data: { userId, key: raw, keyHash: hash, prefix },
   });
 
   return { raw, prefix, createdAt: record.createdAt };
 }
 
-/** Get the current key metadata (no secret). */
-export async function getApiKeyMeta(userId: string) {
+/** Get the current key info including the raw key. */
+export async function getApiKey(userId: string) {
   return prisma.apiKey.findUnique({
     where: { userId },
-    select: { id: true, prefix: true, createdAt: true },
+    select: { id: true, key: true, prefix: true, createdAt: true },
   });
 }
 

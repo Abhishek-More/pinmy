@@ -2,13 +2,14 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Copy, Check, RefreshCw, Trash2, ArrowLeft, Key } from "lucide-react";
+import { Copy, Check, RefreshCw, Trash2, ArrowLeft, Key, Eye, EyeOff } from "lucide-react";
 import { authClient } from "@/lib/clients/auth-browser";
 import { Typography } from "@/components/typography/Typography";
 import { Button } from "@/components/ui/button";
 import { Identicon } from "@/components/general/Identicon";
 
-interface KeyMeta {
+interface KeyData {
+  key: string;
   prefix: string;
   createdAt: string;
 }
@@ -17,8 +18,8 @@ export default function ProfilePage() {
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
 
-  const [keyMeta, setKeyMeta] = useState<KeyMeta | null>(null);
-  const [revealedKey, setRevealedKey] = useState<string | null>(null);
+  const [keyData, setKeyData] = useState<KeyData | null>(null);
+  const [visible, setVisible] = useState(false);
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -34,7 +35,7 @@ export default function ProfilePage() {
     try {
       const res = await fetch("/api/keys");
       const data = await res.json();
-      setKeyMeta(data.key ?? null);
+      setKeyData(data.key ?? null);
     } finally {
       setLoading(false);
     }
@@ -50,8 +51,8 @@ export default function ProfilePage() {
     try {
       const res = await fetch("/api/keys", { method: "POST" });
       const data = await res.json();
-      setRevealedKey(data.raw);
-      setKeyMeta({ prefix: data.prefix, createdAt: data.createdAt });
+      setKeyData({ key: data.raw, prefix: data.prefix, createdAt: data.createdAt });
+      setVisible(true);
     } finally {
       setGenerating(false);
     }
@@ -59,14 +60,14 @@ export default function ProfilePage() {
 
   const handleRevoke = async () => {
     await fetch("/api/keys", { method: "DELETE" });
-    setKeyMeta(null);
-    setRevealedKey(null);
+    setKeyData(null);
+    setVisible(false);
     setCopied(false);
   };
 
   const handleCopy = async () => {
-    if (!revealedKey) return;
-    await navigator.clipboard.writeText(revealedKey);
+    if (!keyData) return;
+    await navigator.clipboard.writeText(keyData.key);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -112,44 +113,48 @@ export default function ProfilePage() {
 
           {loading ? (
             <div className="h-12 animate-pulse border-2 border-black/10 bg-gray-100" />
-          ) : keyMeta ? (
+          ) : keyData ? (
             <div className="flex flex-col gap-4">
               {/* Key display */}
               <div className="flex items-center gap-3">
                 <div className="flex-1 overflow-hidden border-2 border-black bg-gray-50 px-4 py-3 font-mono text-sm">
-                  {revealedKey ? (
-                    <span className="break-all">{revealedKey}</span>
+                  {visible ? (
+                    <span className="break-all">{keyData.key}</span>
                   ) : (
                     <span className="text-muted-foreground">
-                      {keyMeta.prefix}{"••••••••••••••••••••••••"}
+                      {keyData.prefix}{"••••••••••••••••••••••••"}
                     </span>
                   )}
                 </div>
-                {revealedKey && (
-                  <Button
-                    onClick={handleCopy}
-                    variant="outline"
-                    className="shrink-0 border-2 border-black p-2"
-                    title="Copy to clipboard"
-                  >
-                    {copied ? (
-                      <Check className="h-4 w-4" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </Button>
-                )}
+                <Button
+                  onClick={() => setVisible((v) => !v)}
+                  variant="outline"
+                  className="shrink-0 border-2 border-black p-2"
+                  title={visible ? "Hide key" : "Show key"}
+                >
+                  {visible ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  onClick={handleCopy}
+                  variant="outline"
+                  className="shrink-0 border-2 border-black p-2"
+                  title="Copy to clipboard"
+                >
+                  {copied ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                </Button>
               </div>
-
-              {revealedKey && (
-                <div className="border-2 border-amber-400 bg-amber-50 px-4 py-3 text-xs font-medium">
-                  Copy this key now. You won't be able to see it again.
-                </div>
-              )}
 
               <Typography variant="detail">
                 Created{" "}
-                {new Date(keyMeta.createdAt).toLocaleDateString("en-US", {
+                {new Date(keyData.createdAt).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "short",
                   day: "numeric",

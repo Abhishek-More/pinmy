@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/clients/auth";
 import {
   createApiKey,
-  getApiKeyMeta,
+  getApiKey,
   revokeApiKey,
 } from "@/features/key/key.service";
 
@@ -17,7 +17,7 @@ export async function GET() {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const meta = await getApiKeyMeta(session.user.id);
+  const meta = await getApiKey(session.user.id);
   return Response.json({ key: meta });
 }
 
