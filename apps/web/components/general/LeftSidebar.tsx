@@ -2,7 +2,7 @@
 
 import { Typography } from "../typography/Typography";
 import { authClient } from "@/lib/clients/auth-browser";
-import { LogOut } from "lucide-react";
+import { LogOut, Key } from "lucide-react";
 import useSWR from "swr";
 import { PinRequests } from "@/lib/requests/PinRequests";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -37,16 +37,25 @@ const ProfileSection = () => {
         </div>
         <Typography className="font-semibold">{phone}</Typography>
       </div>
-      <button
-        onClick={async () => {
-          await authClient.signOut();
-          router.push("/login");
-        }}
-        className="cursor-pointer p-1 hover:bg-gray-100"
-        title="Sign out"
-      >
-        <LogOut className="h-4 w-4" />
-      </button>
+      <div className="flex items-center gap-1">
+        <button
+          onClick={() => router.push("/profile")}
+          className="cursor-pointer p-1 hover:bg-gray-100"
+          title="API Settings"
+        >
+          <Key className="h-4 w-4" />
+        </button>
+        <button
+          onClick={async () => {
+            await authClient.signOut();
+            router.push("/login");
+          }}
+          className="cursor-pointer p-1 hover:bg-gray-100"
+          title="Sign out"
+        >
+          <LogOut className="h-4 w-4" />
+        </button>
+      </div>
     </div>
   );
 };

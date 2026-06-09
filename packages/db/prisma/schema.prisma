@@ -72,6 +72,7 @@ model User {
   phoneNumberVerified Boolean?
   sessions            Session[]
   accounts            Account[]
+  apiKey              ApiKey?
 
   image String?
 
@@ -109,6 +110,17 @@ model PinChunk {
   @@unique([pinId, sequence])
   @@index([pinId])
   @@map("pin_chunk")
+}
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  keyHash   String   @unique @map("key_hash")
+  prefix    String
+  createdAt DateTime @default(now())
+
+  @@map("api_key")
 }
 
 model Jwks {
