@@ -57,6 +57,13 @@ data = JSON.parse(res.body)["data"]`;
 
 function UsageSnippets() {
   const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const [copiedLang, setCopiedLang] = useState<Language | null>(null);
+
+  const handleCopy = async (lang: Language) => {
+    await navigator.clipboard.writeText(snippet(lang, origin));
+    setCopiedLang(lang);
+    setTimeout(() => setCopiedLang(null), 2000);
+  };
 
   return (
     <Tabs defaultValue="cURL">
@@ -69,9 +76,22 @@ function UsageSnippets() {
       </TabsList>
       {LANGUAGES.map((lang) => (
         <TabsContent key={lang} value={lang}>
-          <pre className="overflow-x-auto border-2 border-black bg-gray-950 px-4 py-4 font-mono text-xs text-green-400">
-            {snippet(lang, origin)}
-          </pre>
+          <div className="relative">
+            <pre className="overflow-x-auto border-2 border-black bg-gray-950 px-4 py-4 pr-12 font-mono text-xs text-green-400">
+              {snippet(lang, origin)}
+            </pre>
+            <button
+              onClick={() => handleCopy(lang)}
+              className="absolute top-3 right-3 cursor-pointer rounded-none border border-white/20 bg-white/10 p-1.5 text-white/60 transition-colors hover:bg-white/20 hover:text-white"
+              title="Copy snippet"
+            >
+              {copiedLang === lang ? (
+                <Check className="h-3.5 w-3.5" />
+              ) : (
+                <Copy className="h-3.5 w-3.5" />
+              )}
+            </button>
+          </div>
         </TabsContent>
       ))}
     </Tabs>
