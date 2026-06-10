@@ -62,7 +62,7 @@ function UsageSnippets() {
     <Tabs defaultValue="cURL">
       <TabsList variant="line" className="mb-3 gap-0">
         {LANGUAGES.map((lang) => (
-          <TabsTrigger key={lang} value={lang} className="px-3 py-1.5 text-xs font-semibold">
+          <TabsTrigger key={lang} value={lang} className="cursor-pointer px-3 py-1.5 text-xs font-semibold">
             {lang}
           </TabsTrigger>
         ))}
