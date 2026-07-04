@@ -63,6 +63,11 @@ const PlaceCard = ({
         <Typography variant="small" className="mt-1 font-semibold">
           {place.category ?? "Other"}
         </Typography>
+        {place.note && (
+          <p className="text-muted-foreground mt-2 border-l-[3px] border-black pl-2.5 text-sm leading-relaxed">
+            {place.note}
+          </p>
+        )}
       </div>
 
       <div className="flex shrink-0 flex-col items-end justify-between gap-1 self-stretch">
