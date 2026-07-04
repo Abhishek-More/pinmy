@@ -1,3 +1,12 @@
+import { decodeEntities } from "@pinmy/db";
+import {
+  isMapLink,
+  extractCoordsFromUrl,
+  extractCoordsFromHtml,
+  placeNameFromUrl,
+  type Coords,
+} from "../utils/maps";
+
 const MAX_HTML_SIZE = 1024 * 1024; // 1MB
 const MAX_CONTENT_LENGTH = 50_000;
 
@@ -14,18 +23,11 @@ function extractText(html: string): string {
   result = result.replace(/<footer[\s\S]*?<\/footer>/gi, " ");
   result = result.replace(/<aside[\s\S]*?<\/aside>/gi, " ");
   result = result.replace(/<[^>]+>/g, " ");
-  result = result.replace(/&nbsp;/g, " ");
-  result = result.replace(/&amp;/g, "&");
-  result = result.replace(/&lt;/g, "<");
-  result = result.replace(/&gt;/g, ">");
-  result = result.replace(/&quot;/g, '"');
-  result = result.replace(/&#\d+;/g, " ");
+  result = decodeEntities(result);
   result = result.replace(/\s+/g, " ");
   result = result.substring(0, MAX_CONTENT_LENGTH).trim();
   return result;
 }
-
-import { decodeEntities } from "@pinmy/db";
 
 function extractMeta(html: string, patterns: RegExp[]): string {
   for (const pattern of patterns) {
@@ -40,17 +42,22 @@ export async function scrapeLink(url: string) {
   const timeout = setTimeout(() => controller.abort(), 10_000);
 
   let html: string;
+  let finalUrl = url;
   try {
     const response = await fetch(url, { signal: controller.signal });
+    finalUrl = response.url || url;
     const buffer = await response.arrayBuffer();
     html = new TextDecoder().decode(buffer.slice(0, MAX_HTML_SIZE));
   } catch (e) {
-    return { title: url, description: "", image: "", content: "", url };
+    // Short map links still carry coords and a place name even when the fetch fails.
+    const coords = isMapLink(url) ? extractCoordsFromUrl(url) : null;
+    const title = (isMapLink(url) && placeNameFromUrl(url)) || url;
+    return { title, description: "", image: "", content: "", url, ...(coords ?? { latitude: null, longitude: null }) };
   } finally {
     clearTimeout(timeout);
   }
 
-  const title = extractMeta(html, [
+  let title = extractMeta(html, [
     /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i,
     /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:title["']/i,
     /<title[^>]*>([^<]+)<\/title>/i,
@@ -72,5 +79,24 @@ export async function scrapeLink(url: string) {
 
   const content = extractText(html);
 
-  return { title, description, image, content, url };
+  let coords: Coords | null = null;
+  if (isMapLink(finalUrl) || isMapLink(url)) {
+    coords =
+      extractCoordsFromUrl(finalUrl) ??
+      extractCoordsFromUrl(url) ??
+      extractCoordsFromHtml(html);
+    // Map pages fetched server-side are JS shells with junk titles ("Google Maps");
+    // the shared URL itself names the place.
+    const placeName = placeNameFromUrl(finalUrl) ?? placeNameFromUrl(url);
+    if (placeName) title = placeName;
+  }
+
+  return {
+    title,
+    description,
+    image,
+    content,
+    url,
+    ...(coords ?? { latitude: null, longitude: null }),
+  };
 }

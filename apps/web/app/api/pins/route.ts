@@ -1,7 +1,6 @@
 import { headers } from "next/headers";
 import { auth } from "@/lib/clients/auth";
-import { prisma } from "@/lib/clients/prisma";
-import { searchPins, decodeEntities } from "@pinmy/db";
+import { prisma, searchPins, decodeEntities } from "@pinmy/db";
 import { MessageQueueClient } from "@pinmy/queue";
 
 export async function GET(request: Request) {
@@ -33,7 +32,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { title, link } = body;
+  const { title, link, note } = body;
 
   if (!title || !link) {
     return Response.json(
@@ -43,7 +42,12 @@ export async function POST(request: Request) {
   }
 
   const pin = await prisma.pin.create({
-    data: { title: decodeEntities(title), link, userId: session.user.id },
+    data: {
+      title: decodeEntities(title),
+      link,
+      note: typeof note === "string" && note.trim() ? note.trim() : null,
+      userId: session.user.id,
+    },
   });
 
   MessageQueueClient.publish("/webhook/process", {

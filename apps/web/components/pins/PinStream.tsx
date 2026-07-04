@@ -17,13 +17,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/clients/auth-browser";
-import { samplePins } from "@/lib/constants";
 import { PinRequests, type PinWithSnippet } from "@/lib/requests/PinRequests";
 import { usePinStore } from "@/lib/stores/usePinStore";
 
 export const PinStream = () => {
   const searchQuery = usePinStore((s) => s.searchQuery);
   const selectedCategory = usePinStore((s) => s.selectedCategory);
+  const view = usePinStore((s) => s.view);
   const { data: session, isPending } = authClient.useSession();
 
   const swrKey = session?.user
@@ -47,11 +47,14 @@ export const PinStream = () => {
   }, [isPending]);
 
   const isLoading = !timedOut && (isPending || (session?.user && !fetchedPins));
-  const allPins = isLoading ? null : (fetchedPins ?? samplePins);
+  const allPins = isLoading ? null : (fetchedPins ?? []);
+  const scoped = allPins?.filter((p) =>
+    view === "places" ? p.latitude != null : p.latitude == null,
+  );
   const pins =
-    allPins && selectedCategory
-      ? allPins.filter((p) => (p.category ?? "Other") === selectedCategory)
-      : allPins;
+    scoped && view === "pins" && selectedCategory
+      ? scoped.filter((p) => (p.category ?? "Other") === selectedCategory)
+      : scoped;
   const [open, setOpen] = useState(false);
   const [link, setLink] = useState("");
   const [loading, setLoading] = useState(false);

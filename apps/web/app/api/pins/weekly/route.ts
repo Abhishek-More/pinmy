@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { auth } from "@/lib/clients/auth";
-import { prisma } from "@/lib/clients/prisma";
+import { prisma } from "@pinmy/db";
 
 const MAX_DAYS = 365;
 
@@ -11,7 +11,10 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const days = Math.min(Math.max(Number(searchParams.get("days")) || 30, 7), MAX_DAYS);
+  const days = Math.min(
+    Math.max(Number(searchParams.get("days")) || 30, 7),
+    MAX_DAYS,
+  );
 
   const now = new Date();
   const startDate = new Date(now);
@@ -34,7 +37,9 @@ export async function GET(request: Request) {
     date.setHours(0, 0, 0, 0);
     const nextDate = new Date(date);
     nextDate.setDate(date.getDate() + 1);
-    const count = pins.filter((p) => p.createdAt >= date && p.createdAt < nextDate).length;
+    const count = pins.filter(
+      (p) => p.createdAt >= date && p.createdAt < nextDate,
+    ).length;
     data.push({
       date: date.toISOString().slice(0, 10),
       dow: date.getDay(),

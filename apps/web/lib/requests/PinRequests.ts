@@ -7,8 +7,11 @@ export interface Pin {
   title: string;
   link: string;
   description?: string | null;
+  note?: string | null;
   image?: string | null;
   category?: string;
+  latitude?: number | null;
+  longitude?: number | null;
   status: string;
   platform: string;
   userId: string;
@@ -47,7 +50,7 @@ export const PinRequests = {
 
   get: (uniqueId: string) => fetch(`${BASE}/${uniqueId}`).then(handleResponse),
 
-  create: async (data: { title: string; link: string }) => {
+  create: async (data: { title: string; link: string; note?: string }) => {
     const pin = await fetch(BASE, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

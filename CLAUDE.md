@@ -1,5 +1,1 @@
-Monorepo structure:
-- `apps/web` — Next.js frontend
-- `apps/api` — Hono backend (TODO)
-
-See `apps/web/AGENTS.md` for Next.js-specific instructions.
+See `AGENTS.md` for the repo overview and conventions, and `apps/web/AGENTS.md` for Next.js-specific instructions.

@@ -1,6 +1,5 @@
 import { resolveApiKey } from "@/features/key/key.service";
-import { prisma } from "@/lib/clients/prisma";
-import { searchPins } from "@pinmy/db";
+import { prisma, searchPins } from "@pinmy/db";
 
 async function authenticateApiKey(request: Request): Promise<string | null> {
   const header = request.headers.get("authorization");
@@ -15,7 +14,10 @@ export async function GET(request: Request) {
   const userId = await authenticateApiKey(request);
   if (!userId) {
     return Response.json(
-      { error: "Invalid or missing API key. Pass it as: Authorization: Bearer pm_..." },
+      {
+        error:
+          "Invalid or missing API key. Pass it as: Authorization: Bearer pm_...",
+      },
       { status: 401 },
     );
   }
@@ -34,7 +36,9 @@ export async function GET(request: Request) {
     const results = await searchPins(q, userId);
     // Apply category filter, pagination on search results
     let filtered = category
-      ? results.filter((r) => r.category?.toLowerCase() === category.toLowerCase())
+      ? results.filter(
+          (r) => r.category?.toLowerCase() === category.toLowerCase(),
+        )
       : results;
     const total = filtered.length;
     filtered = filtered.slice(offset, offset + limit);
@@ -67,6 +71,8 @@ export async function GET(request: Request) {
         description: true,
         image: true,
         category: true,
+        latitude: true,
+        longitude: true,
         status: true,
         platform: true,
         createdAt: true,
@@ -88,6 +94,8 @@ function formatPin(pin: {
   description?: string | null;
   image?: string | null;
   category?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   status: string;
   platform: string;
   createdAt: string | Date;
@@ -99,6 +107,8 @@ function formatPin(pin: {
     description: pin.description ?? null,
     image: pin.image ?? null,
     category: pin.category ?? null,
+    latitude: pin.latitude ?? null,
+    longitude: pin.longitude ?? null,
     status: pin.status,
     platform: pin.platform,
     created_at: pin.createdAt,

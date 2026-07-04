@@ -2,7 +2,7 @@
 
 import { Typography } from "../typography/Typography";
 import { authClient } from "@/lib/clients/auth-browser";
-import { LogOut, Key } from "lucide-react";
+import { LogOut, Key, MapPin } from "lucide-react";
 import useSWR from "swr";
 import { PinRequests } from "@/lib/requests/PinRequests";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -68,11 +68,17 @@ const CollectionsSection = () => {
   );
   const selectedCategory = usePinStore((s) => s.selectedCategory);
   const setSelectedCategory = usePinStore((s) => s.setSelectedCategory);
+  const view = usePinStore((s) => s.view);
+  const setView = usePinStore((s) => s.setView);
 
-  const collections = useMemo(() => {
-    const totalCount = pins?.length ?? 0;
+  const { collections, placeCount } = useMemo(() => {
+    let placeCount = 0;
     const counts: Record<string, number> = {};
     for (const pin of pins ?? []) {
+      if (pin.latitude != null) {
+        placeCount++;
+        continue;
+      }
       const cat = pin.category ?? "Other";
       counts[cat] = (counts[cat] ?? 0) + 1;
     }
@@ -87,17 +93,42 @@ const CollectionsSection = () => {
         count,
       }));
 
-    return [
-      { name: "ALL", color: null as string | null, count: totalCount },
-      ...categories,
-    ];
+    const totalCount = (pins?.length ?? 0) - placeCount;
+    return {
+      collections: [
+        { name: "ALL", color: null as string | null, count: totalCount },
+        ...categories,
+      ],
+      placeCount,
+    };
   }, [pins]);
 
   const isSelected = (name: string) =>
-    name === "ALL" ? selectedCategory === null : selectedCategory === name;
+    view === "pins" &&
+    (name === "ALL" ? selectedCategory === null : selectedCategory === name);
+
+  const selectCollection = (name: string) => {
+    setView("pins");
+    setSelectedCategory(name === "ALL" ? null : name);
+  };
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-0">
+      <div
+        onClick={() => {
+          setView("places");
+          setSelectedCategory(null);
+        }}
+        className={`mb-4 flex shrink-0 cursor-pointer items-center justify-between border-[3px] border-black p-3 ${
+          view === "places" ? "bg-black text-white" : "bg-white hover:bg-gray-50"
+        }`}
+      >
+        <div className="flex items-center gap-2">
+          <MapPin className="h-4 w-4 shrink-0" />
+          <Typography className="text-sm font-bold">Places</Typography>
+        </div>
+        <Typography className="text-sm">{placeCount}</Typography>
+      </div>
       <div className="mb-3 flex w-1/2 shrink-0 items-center gap-2">
         <div className="h-px flex-1 bg-black/20" />
         <Typography variant="label">Collections</Typography>
@@ -107,9 +138,7 @@ const CollectionsSection = () => {
         {collections.map((col) => (
           <div
             key={col.name}
-            onClick={() =>
-              setSelectedCategory(col.name === "ALL" ? null : col.name)
-            }
+            onClick={() => selectCollection(col.name)}
             className={`mt-2 flex cursor-pointer items-center justify-between border-[3px] border-black p-3 first:mt-0 ${
               isSelected(col.name)
                 ? "bg-black text-white"

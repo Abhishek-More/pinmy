@@ -1,4 +1,3 @@
-import { Sidebar } from "@/components/general/Sidebar";
 import { EditPinModal } from "@/components/pins/modals/EditPinModal";
 import { CreatePinModal } from "@/components/pins/modals/CreatePinModal";
 

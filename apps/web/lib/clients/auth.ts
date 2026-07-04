@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { phoneNumber, jwt } from "better-auth/plugins";
-import { prisma } from "./prisma";
+import { prisma } from "@pinmy/db";
 
 const getTwilioService = () =>
   import("../../features/twilio/twilio.service");
@@ -52,11 +52,17 @@ export const auth = betterAuth({
         getTempEmail: (phoneNumber) => `${phoneNumber.replace(/\D/g, "")}@phone.local`,
       },
       sendOTP: async ({ phoneNumber }) => {
+        // Dev-only bypass: agents/browsers can't receive SMS. Never set DEV_OTP in prod.
+        if (process.env.DEV_OTP) {
+          console.log(`[auth] DEV_OTP active; code for ${phoneNumber} is ${process.env.DEV_OTP}`);
+          return;
+        }
         console.log("[auth] sendOTP phoneNumber:", phoneNumber);
         const { sendVerificationCode } = await getTwilioService();
         await sendVerificationCode(phoneNumber);
       },
       verifyOTP: async ({ phoneNumber, code }) => {
+        if (process.env.DEV_OTP) return code === process.env.DEV_OTP;
         console.log("[auth] verifyOTP phoneNumber:", phoneNumber, "code:", code);
         const { verifyCode } = await getTwilioService();
         return verifyCode(phoneNumber, code);

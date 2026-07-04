@@ -1,5 +1,5 @@
 import { randomBytes, createHash } from "node:crypto";
-import { prisma } from "@/lib/clients/prisma";
+import { prisma } from "@pinmy/db";
 
 const PREFIX_LENGTH = 8;
 
@@ -44,9 +44,7 @@ export async function revokeApiKey(userId: string) {
 }
 
 /** Resolve a raw bearer token to a userId, or null if invalid. */
-export async function resolveApiKey(
-  raw: string,
-): Promise<string | null> {
+export async function resolveApiKey(raw: string): Promise<string | null> {
   const hash = hashKey(raw);
   const record = await prisma.apiKey.findUnique({
     where: { keyHash: hash },

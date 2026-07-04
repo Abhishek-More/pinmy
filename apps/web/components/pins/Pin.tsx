@@ -33,16 +33,27 @@ import {
   GraduationCap,
   Leaf,
   Tag,
+  Coffee,
+  Martini,
+  Clapperboard,
+  Trees,
+  Mountain,
+  ShoppingBag,
+  BedDouble,
   Loader,
   type LucideIcon,
 } from "lucide-react";
 import { useModalStore } from "@/lib/stores/useModalStore";
 import type { PinWithSnippet } from "@/lib/requests/PinRequests";
-import { CATEGORY_COLORS, type Category } from "@pinmy/config";
+import {
+  CATEGORY_COLORS,
+  type Category,
+  type PlaceCategory,
+} from "@pinmy/config";
 import { PixelThumbnail } from "./PixelThumbnail";
 import { GenerativeThumbnail } from "./GenerativeThumbnail";
 
-const TAG_ICONS: Record<Category, LucideIcon> = {
+const TAG_ICONS: Record<Category | PlaceCategory, LucideIcon> = {
   Engineering: Code,
   Design: Palette,
   Research: FlaskConical,
@@ -72,15 +83,23 @@ const TAG_ICONS: Record<Category, LucideIcon> = {
   Business: Building2,
   Education: GraduationCap,
   Environment: Leaf,
+  Coffee: Coffee,
+  Bar: Martini,
+  Entertainment: Clapperboard,
+  Park: Trees,
+  Outdoors: Mountain,
+  Shopping: ShoppingBag,
+  Hotel: BedDouble,
+  Museum: Landmark,
   Other: Tag,
 };
 
 const PROCESSING_CONFIG = { color: "#FBBF24", icon: Loader };
 
 function getTagConfig(category: string) {
-  const color =
-    CATEGORY_COLORS[category as Category] ?? CATEGORY_COLORS["Other"];
-  const icon = TAG_ICONS[category as Category] ?? TAG_ICONS["Other"];
+  const key = category as Category | PlaceCategory;
+  const color = CATEGORY_COLORS[key] ?? CATEGORY_COLORS["Other"];
+  const icon = TAG_ICONS[key] ?? TAG_ICONS["Other"];
   return { color, icon };
 }
 
@@ -150,6 +169,13 @@ export const Pin = ({ pin }: { pin: PinWithSnippet }) => {
             </button>
           </div>
         </div>
+
+        {/* User note */}
+        {pin.note && (
+          <p className="text-muted-foreground mt-3 border-l-[3px] border-black pl-3 text-sm leading-relaxed">
+            {pin.note}
+          </p>
+        )}
 
         {/* Search snippet */}
         {pin.snippet && (

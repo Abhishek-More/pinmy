@@ -8,7 +8,8 @@ export function cn(...inputs: ClassValue[]) {
 export function timeAgo(input?: number | string): string {
   if (!input) return "";
 
-  const timestamp = typeof input === "string" ? new Date(input).getTime() : input;
+  const timestamp =
+    typeof input === "string" ? new Date(input).getTime() : input;
   if (isNaN(timestamp)) return "";
 
   const seconds = Math.floor((Date.now() - timestamp) / 1000);
@@ -48,6 +49,3 @@ export const cleanURL = (url: string, maxSegments = 2): string => {
 
   return host + path;
 };
-
-export const fetcher = (...args: Parameters<typeof fetch>) =>
-  fetch(...args).then((res) => res.json());

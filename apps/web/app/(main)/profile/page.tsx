@@ -118,6 +118,10 @@ export default function ProfilePage() {
     setLoading(true);
     try {
       const res = await fetch("/api/keys");
+      if (!res.ok) {
+        setKeyData(null);
+        return;
+      }
       const data = await res.json();
       setKeyData(data.key ?? null);
     } finally {
@@ -134,6 +138,7 @@ export default function ProfilePage() {
     setCopied(false);
     try {
       const res = await fetch("/api/keys", { method: "POST" });
+      if (!res.ok) return;
       const data = await res.json();
       setKeyData({ key: data.raw, prefix: data.prefix, createdAt: data.createdAt });
       setVisible(true);

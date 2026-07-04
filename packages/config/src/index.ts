@@ -33,7 +33,23 @@ export const CATEGORIES = [
 
 export type Category = (typeof CATEGORIES)[number];
 
-export const CATEGORY_COLORS: Record<Category, string> = {
+/** Categories used for map/place pins (stored in the same `category` column). */
+export const PLACE_CATEGORIES = [
+  "Food",
+  "Coffee",
+  "Bar",
+  "Entertainment",
+  "Park",
+  "Outdoors",
+  "Shopping",
+  "Hotel",
+  "Museum",
+  "Other",
+] as const;
+
+export type PlaceCategory = (typeof PLACE_CATEGORIES)[number];
+
+export const CATEGORY_COLORS: Record<Category | PlaceCategory, string> = {
   Engineering: "#D4A0FF",
   Design: "#FFA0A0",
   Research: "#7EEDE4",
@@ -63,5 +79,13 @@ export const CATEGORY_COLORS: Record<Category, string> = {
   Business: "#B8A4FF",
   Education: "#93B8FF",
   Environment: "#6EE8B0",
+  Coffee: "#D9B48F",
+  Bar: "#F0A8E0",
+  Entertainment: "#FFD080",
+  Park: "#9AE89A",
+  Outdoors: "#A8D8A0",
+  Shopping: "#F8B8D8",
+  Hotel: "#B0C8F8",
+  Museum: "#E0C8F0",
   Other: "#C0CCD8",
 };

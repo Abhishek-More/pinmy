@@ -12,6 +12,7 @@ export const CreatePinModal = () => {
   const closeCreatePin = useModalStore((s) => s.closeCreatePin);
   const [title, setTitle] = useState("");
   const [link, setLink] = useState("");
+  const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
 
   const canSave = title.trim() && link.trim() && !saving;
@@ -20,9 +21,14 @@ export const CreatePinModal = () => {
     if (!canSave) return;
     setSaving(true);
     try {
-      await PinRequests.create({ title: title.trim(), link: link.trim() });
+      await PinRequests.create({
+        title: title.trim(),
+        link: link.trim(),
+        note: note.trim() || undefined,
+      });
       setTitle("");
       setLink("");
+      setNote("");
       closeCreatePin();
     } finally {
       setSaving(false);
@@ -33,6 +39,7 @@ export const CreatePinModal = () => {
     if (saving) return;
     setTitle("");
     setLink("");
+    setNote("");
     closeCreatePin();
   };
 
@@ -69,6 +76,19 @@ export const CreatePinModal = () => {
             onKeyDown={(e) => e.key === "Enter" && handleSave()}
             placeholder="https://..."
             className="h-11 px-3 text-sm"
+          />
+        </div>
+
+        <div className="mt-4 flex flex-col gap-1.5">
+          <label className="text-xs font-bold tracking-wide uppercase">
+            Note
+          </label>
+          <textarea
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Optional note about this pin"
+            rows={3}
+            className="placeholder:text-muted-foreground w-full resize-none border-2 border-black bg-transparent px-2.5 py-2 text-sm outline-none"
           />
         </div>
       </Modal.Body>

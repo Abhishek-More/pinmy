@@ -15,10 +15,8 @@
         "DATABASE_URL",
         "TWILIO_SID",
         "TWILIO_AUTH_TOKEN",
-        "QSTASH_URL",
         "QSTASH_TOKEN",
-        "QSTASH_CURRENT_SIGNING_KEY",
-        "QSTASH_NEXT_SIGNING_KEY"
+        "DEV_OTP"
       ]
     },
     "db:generate": {

@@ -25,16 +25,22 @@ async function validateAndResolveUser(phone: string, link: string, c: Context) {
 
 async function scrapeAndClassify(link: string) {
   const scraped = await scrapeLink(link);
-  const category = await classifyPin(scraped.title, scraped.description, link);
+  const isPlace = scraped.latitude != null;
+  const category = await classifyPin(
+    scraped.title,
+    scraped.description,
+    link,
+    isPlace,
+  );
   return { scraped, category };
 }
 
 async function createChunks(content: string, pinId: number) {
-  for (const chunk of chunkText(content)) {
-    await prisma.pinChunk.create({
-      data: { pinId, sequence: chunk.sequence, content: chunk.content },
-    });
-  }
+  const chunks = chunkText(content);
+  if (chunks.length === 0) return;
+  await prisma.pinChunk.createMany({
+    data: chunks.map((chunk) => ({ pinId, ...chunk })),
+  });
 }
 
 // POST /webhook/twilio
@@ -48,14 +54,10 @@ webhook.post("/twilio", async (c) => {
   const { user, error } = await validateAndResolveUser(phone, link, c);
   if (error) return error;
 
-  const scraped = await scrapeLink(link);
-
   const pin = await prisma.pin.create({
     data: {
-      title: scraped.title,
+      title: link,
       link,
-      description: scraped.description || null,
-      image: scraped.image || null,
       status: "PROCESSING",
       platform: "sms",
       userId: user.id,
@@ -94,7 +96,18 @@ webhook.post("/process", async (c) => {
 
   const updatedPin = await prisma.pin.update({
     where: { id: pin.id },
-    data: { category, image: scraped.image || null, status: "READY" },
+    data: {
+      // SMS pins are created with title=link as a placeholder; fill in the scraped one.
+      ...(pin.title === pin.link && {
+        title: scraped.title,
+        description: scraped.description || null,
+      }),
+      category,
+      image: scraped.image || null,
+      latitude: scraped.latitude,
+      longitude: scraped.longitude,
+      status: "READY",
+    },
   });
 
   return c.json({ status: "created", pin: updatedPin }, 201);

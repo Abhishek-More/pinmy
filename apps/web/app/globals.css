@@ -154,6 +154,37 @@ body {
   }
 }
 
+/* Numbered map markers for the Places view */
+.place-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 3px solid #111;
+  box-shadow: -3px 3px 0 #111;
+  background: #fff;
+  color: #111;
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.place-marker-selected {
+  color: #fff;
+}
+
+.leaflet-container {
+  font-family: var(--font-jetbrains-mono), monospace;
+}
+
+.leaflet-tooltip {
+  border: 2px solid #111;
+  border-radius: 0;
+  box-shadow: -3px 3px 0 #111;
+  font-weight: 600;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
