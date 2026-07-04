@@ -3,14 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import useSWR from "swr";
-import { Ellipsis, ExternalLink, MapPin } from "lucide-react";
+import { ArrowUpRight, Ellipsis, MapPin } from "lucide-react";
 import { Typography } from "../typography/Typography";
 import { Skeleton } from "@/components/ui/skeleton";
 import { authClient } from "@/lib/clients/auth-browser";
 import { PinRequests } from "@/lib/requests/PinRequests";
 import { usePinStore } from "@/lib/stores/usePinStore";
 import { useModalStore } from "@/lib/stores/useModalStore";
-import { cleanURL, timeAgo } from "@/lib/utils";
+import { timeAgo } from "@/lib/utils";
 import { CATEGORY_COLORS } from "@pinmy/config";
 import type { PlacePin } from "./PlaceMap";
 
@@ -60,17 +60,12 @@ const PlaceCard = ({
         <Typography variant="large" className="line-clamp-2">
           {place.title}
         </Typography>
-        <div className="mt-1 flex items-center gap-2">
-          <Typography variant="small" className="font-semibold">
-            {place.category ?? "Other"}
-          </Typography>
-          <Typography variant="muted" className="truncate">
-            {cleanURL(place.link, 1)}
-          </Typography>
-        </div>
+        <Typography variant="small" className="mt-1 font-semibold">
+          {place.category ?? "Other"}
+        </Typography>
       </div>
 
-      <div className="flex shrink-0 flex-col items-end gap-1">
+      <div className="flex shrink-0 flex-col items-end justify-between gap-1 self-stretch">
         <div className="relative">
           <Typography
             variant="muted"
@@ -93,10 +88,10 @@ const PlaceCard = ({
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="hover:bg-accent border-2 border-black p-1"
+          className="-m-1 p-1 text-black/40 transition-colors hover:text-black"
           title="Open in Maps"
         >
-          <ExternalLink className="h-3.5 w-3.5" />
+          <ArrowUpRight className="h-4 w-4" />
         </a>
       </div>
     </div>
