@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Tooltip, useMap } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Tooltip,
+  useMap,
+  AttributionControl,
+} from "react-leaflet";
 import { divIcon, latLngBounds } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { CATEGORY_COLORS } from "@pinmy/config";
@@ -68,7 +75,10 @@ export default function PlaceMap({ places, selectedId, onSelect, visKey }: Place
       zoom={12}
       className="z-0 h-full w-full"
       scrollWheelZoom
+      attributionControl={false}
     >
+      {/* prefix="" drops the Leaflet flag; the OSM/CARTO credit is license-required */}
+      <AttributionControl prefix="" position="bottomright" />
       <TileLayer
         url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'

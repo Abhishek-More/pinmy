@@ -185,6 +185,11 @@ body {
   font-weight: 600;
 }
 
+.leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.7) !important;
+  font-size: 9px;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
