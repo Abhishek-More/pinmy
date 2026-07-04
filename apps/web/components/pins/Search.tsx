@@ -29,6 +29,17 @@ export const Search = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // Keep the uncontrolled input in sync when the query is cleared externally
+  // (collection/view switches reset searchQuery in the store).
+  useEffect(() => {
+    return usePinStore.subscribe((state, prev) => {
+      if (prev.searchQuery && !state.searchQuery && inputRef.current) {
+        clearTimeout(debounceRef.current ?? undefined);
+        inputRef.current.value = "";
+      }
+    });
+  }, []);
+
   const handleChange = useCallback(
     (value: string) => {
       if (debounceRef.current) clearTimeout(debounceRef.current);

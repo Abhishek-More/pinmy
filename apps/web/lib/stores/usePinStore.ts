@@ -13,7 +13,9 @@ export const usePinStore = create<PinStore>((set) => ({
   searchQuery: "",
   setSearchQuery: (query) => set({ searchQuery: query }),
   selectedCategory: null,
-  setSelectedCategory: (category) => set({ selectedCategory: category }),
+  // Switching collection or view always resets the active search.
+  setSelectedCategory: (category) =>
+    set({ selectedCategory: category, searchQuery: "" }),
   view: "pins",
-  setView: (view) => set({ view }),
+  setView: (view) => set({ view, searchQuery: "" }),
 }));
