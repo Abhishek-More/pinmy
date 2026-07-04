@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Login } from "@/components/auth/login";
 import { PinStream } from "@/components/pins/PinStream";
@@ -20,6 +20,16 @@ export default function Home() {
   const setView = usePinStore((s) => s.setView);
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
+  const pinScrollRef = useRef<HTMLDivElement>(null);
+  const leftSidebarRef = useRef<HTMLDivElement>(null);
+
+  // Scrolling anywhere outside the left sidebar scrolls the pin list
+  const forwardWheel = (e: React.WheelEvent) => {
+    const el = pinScrollRef.current;
+    if (!el || el.contains(e.target as Node)) return; // pin list scrolls natively
+    if (leftSidebarRef.current?.contains(e.target as Node)) return; // sidebar has its own scroll
+    el.scrollBy({ top: e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY });
+  };
 
   useEffect(() => {
     if (!isPending && !session) {
@@ -28,14 +38,20 @@ export default function Home() {
   }, [isPending, session, router]);
 
   return (
-    <div className="mx-auto grid h-dvh max-w-[2500px] grid-cols-12 overflow-hidden">
+    <div
+      onWheel={view === "places" ? undefined : forwardWheel}
+      className="mx-auto grid h-dvh max-w-[2500px] grid-cols-12 overflow-hidden"
+    >
       {/* Desktop login — hidden on mobile */}
       <div className="absolute top-16 right-16 hidden items-center gap-4 md:flex">
         <Login />
       </div>
 
       {/* Left sidebar — hidden on mobile */}
-      <div className="hidden h-full max-w-11/12 flex-col border-r-2 border-black/10 md:col-span-4 md:flex lg:col-span-3">
+      <div
+        ref={leftSidebarRef}
+        className="hidden h-full max-w-11/12 flex-col border-r-2 border-black/10 md:col-span-4 md:flex lg:col-span-3"
+      >
         <LeftSidebar />
       </div>
 
@@ -95,7 +111,10 @@ export default function Home() {
             <PlacesView />
           </div>
         ) : (
-          <div className="scrollbar-hide mb-10 min-h-0 w-full flex-1 overflow-y-auto border-b-1 border-black/40 pb-8">
+          <div
+            ref={pinScrollRef}
+            className="scrollbar-hide mb-10 min-h-0 w-full flex-1 overflow-y-auto border-b-1 border-black/40 pb-8"
+          >
             <PinStream />
           </div>
         )}

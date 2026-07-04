@@ -35,7 +35,7 @@ export async function PUT(
 
   const { id } = await ctx.params;
   const body = await request.json();
-  const { title, link } = body;
+  const { title, link, note } = body;
 
   if (!title || !link) {
     return Response.json(
@@ -54,7 +54,14 @@ export async function PUT(
 
   const pin = await prisma.pin.update({
     where: { uniqueId: id },
-    data: { title, link },
+    data: {
+      title,
+      link,
+      // Only touch the note when the caller sends the field; null clears it.
+      ...("note" in body
+        ? { note: typeof note === "string" && note.trim() ? note.trim() : null }
+        : {}),
+    },
   });
 
   return Response.json(pin);

@@ -21,6 +21,7 @@ export const EditPinModal = () => {
   const editPin = useModalStore((s) => s.editPin);
   const closeEditPin = useModalStore((s) => s.closeEditPin);
   const [title, setTitle] = useState("");
+  const [note, setNote] = useState("");
   const [action, setAction] = useState<EditAction>(editActions.IDLE);
   const [copied, setCopied] = useState(false);
   const link = editPin?.link ?? "";
@@ -29,6 +30,7 @@ export const EditPinModal = () => {
   useEffect(() => {
     if (editPin) {
       setTitle(editPin.title);
+      setNote(editPin.note ?? "");
     }
   }, [editPin]);
 
@@ -39,6 +41,7 @@ export const EditPinModal = () => {
       await PinRequests.update(editPin.uniqueId, {
         title: title.trim(),
         link: link,
+        note: note.trim() || null,
       });
       closeEditPin();
     } finally {
@@ -117,6 +120,19 @@ export const EditPinModal = () => {
             value={link}
             readOnly
             className="text-muted-foreground h-11 cursor-default px-3 text-sm"
+          />
+        </div>
+
+        <div className="mt-4 flex flex-col gap-1.5">
+          <label className="text-xs font-bold tracking-wide uppercase">
+            Note <span className="font-normal text-black/40">(optional)</span>
+          </label>
+          <textarea
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Optional note about this pin"
+            rows={3}
+            className="placeholder:text-muted-foreground w-full resize-none border-2 border-black bg-transparent px-2.5 py-2 text-sm outline-none"
           />
         </div>
       </Modal.Body>

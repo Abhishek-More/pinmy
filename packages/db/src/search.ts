@@ -6,6 +6,9 @@ export interface SearchResult {
   title: string;
   link: string;
   description: string | null;
+  note: string | null;
+  latitude: number | null;
+  longitude: number | null;
   category: string | null;
   status: string;
   platform: string;
@@ -42,6 +45,9 @@ export async function searchPins(
         p.title,
         p.link,
         p.description,
+        p.note,
+        p.latitude,
+        p.longitude,
         p.category,
         p.status,
         p.platform,
@@ -61,6 +67,9 @@ export async function searchPins(
         p.title,
         p.link,
         p.description,
+        p.note,
+        p.latitude,
+        p.longitude,
         p.category,
         p.status,
         p.platform,
@@ -91,6 +100,9 @@ export async function searchPins(
       title,
       link,
       description,
+      note,
+      latitude,
+      longitude,
       category,
       status,
       platform,
@@ -99,7 +111,7 @@ export async function searchPins(
       MAX(relevance) AS relevance,
       MAX(snippet) AS snippet
     FROM combined
-    GROUP BY id, "uniqueId", title, link, description, category, status, platform, "userId", "createdAt"
+    GROUP BY id, "uniqueId", title, link, description, note, latitude, longitude, category, status, platform, "userId", "createdAt"
     ORDER BY relevance DESC
     LIMIT 50
     `,

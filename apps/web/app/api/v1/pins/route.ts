@@ -69,6 +69,7 @@ export async function GET(request: Request) {
         title: true,
         link: true,
         description: true,
+        note: true,
         image: true,
         category: true,
         latitude: true,
@@ -92,6 +93,7 @@ function formatPin(pin: {
   title: string;
   link: string;
   description?: string | null;
+  note?: string | null;
   image?: string | null;
   category?: string | null;
   latitude?: number | null;
@@ -105,6 +107,7 @@ function formatPin(pin: {
     title: pin.title,
     link: pin.link,
     description: pin.description ?? null,
+    note: pin.note ?? null,
     image: pin.image ?? null,
     category: pin.category ?? null,
     latitude: pin.latitude ?? null,

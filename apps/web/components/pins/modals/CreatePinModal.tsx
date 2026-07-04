@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { useModalStore } from "@/lib/stores/useModalStore";
 import { PinRequests } from "@/lib/requests/PinRequests";
+import { usePinStore } from "@/lib/stores/usePinStore";
 
 export const CreatePinModal = () => {
   const open = useModalStore((s) => s.createPinOpen);
@@ -14,6 +15,7 @@ export const CreatePinModal = () => {
   const [link, setLink] = useState("");
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
+  const isPlaces = usePinStore((s) => s.view) === "places";
 
   // Prefill the link from the clipboard when the modal opens
   useEffect(() => {
@@ -28,14 +30,14 @@ export const CreatePinModal = () => {
       .catch(() => {}); // clipboard permission denied or unavailable
   }, [open]);
 
-  const canSave = title.trim() && link.trim() && !saving;
+  const canSave = link.trim() && !saving;
 
   const handleSave = async () => {
     if (!canSave) return;
     setSaving(true);
     try {
       await PinRequests.create({
-        title: title.trim(),
+        title: title.trim() || undefined,
         link: link.trim(),
         note: note.trim() || undefined,
       });
@@ -61,20 +63,20 @@ export const CreatePinModal = () => {
       open={open}
       onClose={handleClose}
       disabled={saving}
-      tag="New Pin"
+      tag={isPlaces ? "New Place" : "New Pin"}
       tagColor="#72EFDD"
-      title="Create Pin"
+      title={isPlaces ? "Save Place" : "Create Pin"}
     >
       <Modal.Body>
         <div className="mt-5 flex flex-col gap-1.5">
           <label className="text-xs font-bold tracking-wide uppercase">
-            Title
+            Title <span className="font-normal text-black/40">(optional)</span>
           </label>
           <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSave()}
-            placeholder="Pin title"
+            placeholder="Leave blank to auto-detect"
             className="h-11 px-3 text-sm"
           />
         </div>
@@ -87,7 +89,7 @@ export const CreatePinModal = () => {
             value={link}
             onChange={(e) => setLink(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSave()}
-            placeholder="https://..."
+            placeholder={isPlaces ? "Paste a Google or Apple Maps link" : "https://..."}
             className="h-11 px-3 text-sm"
           />
         </div>

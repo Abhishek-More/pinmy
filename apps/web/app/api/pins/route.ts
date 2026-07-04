@@ -34,16 +34,14 @@ export async function POST(request: Request) {
   const body = await request.json();
   const { title, link, note } = body;
 
-  if (!title || !link) {
-    return Response.json(
-      { error: "title and link are required" },
-      { status: 400 },
-    );
+  if (!link) {
+    return Response.json({ error: "link is required" }, { status: 400 });
   }
 
   const pin = await prisma.pin.create({
     data: {
-      title: decodeEntities(title),
+      // No title? Use the link as a placeholder; /webhook/process swaps in the scraped title.
+      title: typeof title === "string" && title.trim() ? decodeEntities(title) : link,
       link,
       note: typeof note === "string" && note.trim() ? note.trim() : null,
       userId: session.user.id,

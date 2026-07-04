@@ -50,7 +50,7 @@ export const PinRequests = {
 
   get: (uniqueId: string) => fetch(`${BASE}/${uniqueId}`).then(handleResponse),
 
-  create: async (data: { title: string; link: string; note?: string }) => {
+  create: async (data: { title?: string; link: string; note?: string }) => {
     const pin = await fetch(BASE, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -60,7 +60,10 @@ export const PinRequests = {
     return pin;
   },
 
-  update: async (uniqueId: string, data: { title: string; link: string }) => {
+  update: async (
+    uniqueId: string,
+    data: { title: string; link: string; note?: string | null },
+  ) => {
     const pin = await fetch(`${BASE}/${uniqueId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
