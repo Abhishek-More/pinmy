@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
@@ -14,6 +14,19 @@ export const CreatePinModal = () => {
   const [link, setLink] = useState("");
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
+
+  // Prefill the link from the clipboard when the modal opens
+  useEffect(() => {
+    if (!open) return;
+    navigator.clipboard
+      ?.readText()
+      .then((text) => {
+        const candidate = text.trim();
+        if (!/^https?:\/\//i.test(candidate) || !URL.canParse(candidate)) return;
+        setLink((prev) => prev || candidate);
+      })
+      .catch(() => {}); // clipboard permission denied or unavailable
+  }, [open]);
 
   const canSave = title.trim() && link.trim() && !saving;
 
