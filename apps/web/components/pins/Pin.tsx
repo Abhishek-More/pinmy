@@ -95,12 +95,33 @@ const TAG_ICONS: Record<Category | PlaceCategory, LucideIcon> = {
 };
 
 const PROCESSING_CONFIG = { color: "#FBBF24", icon: Loader };
+const COMPACT = new Intl.NumberFormat("en", { notation: "compact" });
 
 function getTagConfig(category: string) {
   const key = category as Category | PlaceCategory;
   const color = CATEGORY_COLORS[key] ?? CATEGORY_COLORS["Other"];
   const icon = TAG_ICONS[key] ?? TAG_ICONS["Other"];
   return { color, icon };
+}
+
+function formatDuration(sec: number): string {
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  const mm = h ? String(m).padStart(2, "0") : String(m);
+  return `${h ? `${h}:` : ""}${mm}:${String(s).padStart(2, "0")}`;
+}
+
+/** Video search results deep-link to the matched transcript timestamp. */
+function pinHref(pin: PinWithSnippet): string {
+  if (pin.startSec == null || pin.durationSec == null) return pin.link;
+  try {
+    const url = new URL(pin.link);
+    url.searchParams.set("t", `${pin.startSec}s`);
+    return url.toString();
+  } catch {
+    return pin.link;
+  }
 }
 
 export const Pin = ({ pin }: { pin: PinWithSnippet }) => {
@@ -117,7 +138,7 @@ export const Pin = ({ pin }: { pin: PinWithSnippet }) => {
       className="group relative w-full cursor-pointer border-[3px] border-black bg-white p-4 pt-4 sm:p-5 sm:pt-5"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={() => window.open(pin.link, "_blank", "noopener,noreferrer")}
+      onClick={() => window.open(pinHref(pin), "_blank", "noopener,noreferrer")}
     >
       {/* Status tag */}
       <div
@@ -147,6 +168,9 @@ export const Pin = ({ pin }: { pin: PinWithSnippet }) => {
             </Typography>
             <Typography variant="muted" className="mt-1 truncate">
               {cleanURL(pin.link, 1)}
+              {pin.stars != null && ` · ★ ${COMPACT.format(pin.stars).toLowerCase()}`}
+              {pin.language && ` · ${pin.language}`}
+              {pin.durationSec != null && ` · ${formatDuration(pin.durationSec)}`}
             </Typography>
           </div>
 

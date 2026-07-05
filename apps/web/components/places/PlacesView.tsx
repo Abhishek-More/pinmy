@@ -116,13 +116,18 @@ export const PlacesView = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mobilePane, setMobilePane] = useState<"list" | "map">("list");
 
-  const allPlaces = useMemo(
-    () =>
-      (pins ?? []).filter(
-        (p): p is PlacePin => p.latitude != null && p.longitude != null,
-      ),
-    [pins],
-  );
+  const allPlaces = useMemo(() => {
+    const located = (pins ?? []).filter(
+      (p) => p.latitude != null && p.longitude != null,
+    );
+    // Stable numbering: oldest place = 1, so numbers don't shift as places are added
+    const rank = new Map(
+      [...located].sort((a, b) => a.id - b.id).map((p, i) => [p.uniqueId, i + 1]),
+    );
+    return located.map(
+      (p): PlacePin => ({ ...p, number: rank.get(p.uniqueId)! } as PlacePin),
+    );
+  }, [pins]);
 
   const chips = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -217,11 +222,11 @@ export const PlacesView = () => {
             Array.from({ length: 4 }, (_, i) => (
               <Skeleton key={i} className="h-20 w-full shrink-0" />
             ))}
-          {places.map((place, i) => (
+          {places.map((place) => (
             <PlaceCard
               key={place.uniqueId}
               place={place}
-              index={i + 1}
+              index={place.number}
               selected={place.uniqueId === selectedId}
               onSelect={() => setSelectedId(place.uniqueId)}
             />

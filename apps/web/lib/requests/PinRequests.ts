@@ -12,6 +12,9 @@ export interface Pin {
   category?: string;
   latitude?: number | null;
   longitude?: number | null;
+  stars?: number | null;
+  language?: string | null;
+  durationSec?: number | null;
   status: string;
   platform: string;
   userId: string;
@@ -22,6 +25,8 @@ export interface Pin {
 /** Pin with an optional search snippet from full-text search results. */
 export interface PinWithSnippet extends Pin {
   snippet?: string | null;
+  /** Timestamp of the best-matching transcript chunk (video search results). */
+  startSec?: number | null;
 }
 
 export interface DayCount {

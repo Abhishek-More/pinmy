@@ -72,7 +72,7 @@ export const EditPinModal = () => {
       title="Edit Pin"
       titleRight={
         <Typography variant="detail">
-          // {savedAgo ? ` saved ${savedAgo} ago` : ""}
+          // {savedAgo ? (savedAgo === "now" ? " saved just now" : ` saved ${savedAgo} ago`) : ""}
         </Typography>
       }
     >

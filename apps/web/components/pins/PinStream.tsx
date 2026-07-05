@@ -48,9 +48,11 @@ export const PinStream = () => {
 
   const isLoading = !timedOut && (isPending || (session?.user && !fetchedPins));
   const allPins = isLoading ? null : (fetchedPins ?? []);
-  const scoped = allPins?.filter((p) =>
-    view === "places" ? p.latitude != null : p.latitude == null,
-  );
+  const scoped = allPins?.filter((p) => {
+    if (view === "places") return p.latitude != null;
+    if (view === "videos") return p.durationSec != null;
+    return p.latitude == null && p.durationSec == null;
+  });
   const pins =
     scoped && view === "pins" && selectedCategory
       ? scoped.filter((p) => (p.category ?? "Other") === selectedCategory)

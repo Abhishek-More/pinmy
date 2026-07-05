@@ -6,6 +6,7 @@ import {
   placeNameFromUrl,
   type Coords,
 } from "../utils/maps";
+import { parseGithubRepoLink, fetchGithubRepo } from "../utils/github";
 
 const MAX_HTML_SIZE = 1024 * 1024; // 1MB
 const MAX_CONTENT_LENGTH = 50_000;
@@ -38,6 +39,16 @@ function extractMeta(html: string, patterns: RegExp[]): string {
 }
 
 export async function scrapeLink(url: string) {
+  // GitHub repos: the HTML page is a JS shell; the API gives clean metadata + README.
+  const gh = parseGithubRepoLink(url);
+  if (gh) {
+    const repo = await fetchGithubRepo(gh.owner, gh.repo);
+    if (repo) {
+      return { ...repo, url, latitude: null, longitude: null };
+    }
+    // API failure (rate limit, network): fall through to the normal scrape.
+  }
+
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10_000);
 
@@ -52,7 +63,7 @@ export async function scrapeLink(url: string) {
     // Short map links still carry coords and a place name even when the fetch fails.
     const coords = isMapLink(url) ? extractCoordsFromUrl(url) : null;
     const title = (isMapLink(url) && placeNameFromUrl(url)) || url;
-    return { title, description: "", image: "", content: "", url, ...(coords ?? { latitude: null, longitude: null }) };
+    return { title, description: "", image: "", content: "", url, stars: null, language: null, ...(coords ?? { latitude: null, longitude: null }) };
   } finally {
     clearTimeout(timeout);
   }
@@ -97,6 +108,8 @@ export async function scrapeLink(url: string) {
     image,
     content,
     url,
+    stars: null,
+    language: null,
     ...(coords ?? { latitude: null, longitude: null }),
   };
 }

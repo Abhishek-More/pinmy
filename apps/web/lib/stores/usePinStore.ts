@@ -5,8 +5,8 @@ interface PinStore {
   setSearchQuery: (query: string) => void;
   selectedCategory: string | null;
   setSelectedCategory: (category: string | null) => void;
-  view: "pins" | "places";
-  setView: (view: "pins" | "places") => void;
+  view: "pins" | "places" | "videos";
+  setView: (view: "pins" | "places" | "videos") => void;
 }
 
 export const usePinStore = create<PinStore>((set) => ({

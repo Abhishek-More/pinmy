@@ -9,6 +9,11 @@ export interface SearchResult {
   note: string | null;
   latitude: number | null;
   longitude: number | null;
+  stars: number | null;
+  language: string | null;
+  durationSec: number | null;
+  /** Start time of the best-matching transcript chunk, for video deep links. */
+  startSec: number | null;
   category: string | null;
   status: string;
   platform: string;
@@ -48,6 +53,10 @@ export async function searchPins(
         p.note,
         p.latitude,
         p.longitude,
+        p.stars,
+        p.language,
+        p."durationSec",
+        NULL::INT AS "startSec",
         p.category,
         p.status,
         p.platform,
@@ -70,6 +79,10 @@ export async function searchPins(
         p.note,
         p.latitude,
         p.longitude,
+        p.stars,
+        p.language,
+        p."durationSec",
+        pc."startSec",
         p.category,
         p.status,
         p.platform,
@@ -103,15 +116,19 @@ export async function searchPins(
       note,
       latitude,
       longitude,
+      stars,
+      language,
+      "durationSec",
       category,
       status,
       platform,
       "userId",
       "createdAt",
+      MAX("startSec") AS "startSec",
       MAX(relevance) AS relevance,
       MAX(snippet) AS snippet
     FROM combined
-    GROUP BY id, "uniqueId", title, link, description, note, latitude, longitude, category, status, platform, "userId", "createdAt"
+    GROUP BY id, "uniqueId", title, link, description, note, latitude, longitude, stars, language, "durationSec", category, status, platform, "userId", "createdAt"
     ORDER BY relevance DESC
     LIMIT 50
     `,

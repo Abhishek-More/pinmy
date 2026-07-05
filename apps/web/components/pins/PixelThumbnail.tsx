@@ -35,19 +35,21 @@ export function PixelThumbnail({
   const animRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   useEffect(() => {
+    // Same-origin via the Next image optimizer, so canvas isn't CORS-tainted
+    const proxied = `/_next/image?url=${encodeURIComponent(src)}&w=128&q=75`;
     const img = new Image();
-    img.crossOrigin = "anonymous";
     img.onload = () => {
       const results: string[] = [];
       for (const res of PIXEL_RESOLUTIONS) {
         const dataUrl = downscale(img, res);
         if (dataUrl) results.push(dataUrl);
       }
-      results.push(src);
+      results.push(proxied);
       setSrcs(results);
     };
+    // Optimizer refused it (redirects, local IP, bad image) — show the raw thumbnail
     img.onerror = () => setSrcs([src]);
-    img.src = src;
+    img.src = proxied;
   }, [src]);
 
   useEffect(() => {

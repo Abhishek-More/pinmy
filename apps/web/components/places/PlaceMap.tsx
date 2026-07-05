@@ -9,14 +9,19 @@ import {
   useMap,
   AttributionControl,
 } from "react-leaflet";
-import { divIcon, latLngBounds } from "leaflet";
+import { divIcon, latLngBounds, point, type MarkerCluster } from "leaflet";
+import "leaflet.markercluster"; // registers MarkerCluster types on the leaflet module
+import MarkerClusterGroup from "react-leaflet-markercluster";
 import "leaflet/dist/leaflet.css";
+import "react-leaflet-markercluster/styles";
 import { CATEGORY_COLORS } from "@pinmy/config";
 import type { PinWithSnippet } from "@/lib/requests/PinRequests";
 
 export interface PlacePin extends PinWithSnippet {
   latitude: number;
   longitude: number;
+  /** Stable 1-based number: oldest place = 1, doesn't shift as places are added. */
+  number: number;
 }
 
 interface PlaceMapProps {
@@ -84,30 +89,42 @@ export default function PlaceMap({ places, selectedId, onSelect, visKey }: Place
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
       />
       <MapController places={places} selectedId={selectedId} visKey={visKey} />
-      {places.map((place, i) => {
-        const selected = place.uniqueId === selectedId;
-        const color =
-          CATEGORY_COLORS[(place.category ?? "Other") as keyof typeof CATEGORY_COLORS] ??
-          CATEGORY_COLORS["Other"];
-        return (
-          <Marker
-            key={place.uniqueId}
-            position={[place.latitude, place.longitude]}
-            zIndexOffset={selected ? 1000 : 0}
-            icon={divIcon({
-              className: "",
-              html: `<div class="place-marker${selected ? " place-marker-selected" : ""}" style="background:${selected ? "#111" : color}">${i + 1}</div>`,
-              iconSize: [30, 30],
-              iconAnchor: [15, 15],
-            })}
-            eventHandlers={{ click: () => onSelect(place.uniqueId) }}
-          >
-            <Tooltip direction="top" offset={[0, -18]}>
-              {place.title}
-            </Tooltip>
-          </Marker>
-        );
-      })}
+      <MarkerClusterGroup
+        showCoverageOnHover={false}
+        maxClusterRadius={40}
+        iconCreateFunction={(cluster: MarkerCluster) =>
+          divIcon({
+            className: "",
+            html: `<div class="place-cluster">${cluster.getChildCount()}</div>`,
+            iconSize: point(30, 30),
+          })
+        }
+      >
+        {places.map((place) => {
+          const selected = place.uniqueId === selectedId;
+          const color =
+            CATEGORY_COLORS[(place.category ?? "Other") as keyof typeof CATEGORY_COLORS] ??
+            CATEGORY_COLORS["Other"];
+          return (
+            <Marker
+              key={place.uniqueId}
+              position={[place.latitude, place.longitude]}
+              zIndexOffset={selected ? 1000 : 0}
+              icon={divIcon({
+                className: "",
+                html: `<div class="place-dot${selected ? " place-dot-selected" : ""}" style="background:${selected ? "#111" : color}"></div>`,
+                iconSize: [selected ? 22 : 14, selected ? 22 : 14],
+                iconAnchor: [selected ? 11 : 7, selected ? 11 : 7],
+              })}
+              eventHandlers={{ click: () => onSelect(place.uniqueId) }}
+            >
+              <Tooltip direction="top" offset={[0, -12]}>
+                {place.title}
+              </Tooltip>
+            </Marker>
+          );
+        })}
+      </MarkerClusterGroup>
     </MapContainer>
   );
 }

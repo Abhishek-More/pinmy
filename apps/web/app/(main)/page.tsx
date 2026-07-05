@@ -12,6 +12,7 @@ import { useModalStore } from "@/lib/stores/useModalStore";
 import { usePinStore } from "@/lib/stores/usePinStore";
 import { LeftSidebar } from "@/components/general/LeftSidebar";
 import { RightSidebar } from "@/components/general/RightSidebar";
+import { MobileNav } from "@/components/general/MobileNav";
 import { authClient } from "@/lib/clients/auth-browser";
 
 export default function Home() {
@@ -20,16 +21,25 @@ export default function Home() {
   const setView = usePinStore((s) => s.setView);
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
+  const rootRef = useRef<HTMLDivElement>(null);
   const pinScrollRef = useRef<HTMLDivElement>(null);
   const leftSidebarRef = useRef<HTMLDivElement>(null);
 
-  // Scrolling anywhere outside the left sidebar scrolls the pin list
-  const forwardWheel = (e: React.WheelEvent) => {
-    const el = pinScrollRef.current;
-    if (!el || el.contains(e.target as Node)) return; // pin list scrolls natively
-    if (leftSidebarRef.current?.contains(e.target as Node)) return; // sidebar has its own scroll
-    el.scrollBy({ top: e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY });
-  };
+  // Scrolling anywhere outside the left sidebar scrolls only the pin list.
+  // Native listener because React's onWheel is passive and can't preventDefault.
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || view === "places") return;
+    const onWheel = (e: WheelEvent) => {
+      const el = pinScrollRef.current;
+      if (!el || el.contains(e.target as Node)) return; // pin list scrolls natively
+      if (leftSidebarRef.current?.contains(e.target as Node)) return; // sidebar has its own scroll
+      e.preventDefault();
+      el.scrollBy({ top: e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY });
+    };
+    root.addEventListener("wheel", onWheel, { passive: false });
+    return () => root.removeEventListener("wheel", onWheel);
+  }, [view]);
 
   useEffect(() => {
     if (!isPending && !session) {
@@ -39,7 +49,7 @@ export default function Home() {
 
   return (
     <div
-      onWheel={view === "places" ? undefined : forwardWheel}
+      ref={rootRef}
       className="mx-auto grid h-dvh max-w-[2500px] grid-cols-12 overflow-hidden"
     >
       {/* Desktop login — hidden on mobile */}
@@ -73,22 +83,29 @@ export default function Home() {
               My
             </Typography>
           </div>
-          <Login />
+          <div className="flex items-center gap-3">
+            <Login />
+            <MobileNav />
+          </div>
         </div>
 
         <Search />
-        <div className="mt-8 mb-6 flex w-full shrink-0 items-center justify-between md:mt-12 md:mb-8">
+        <div className="mt-8 mb-6 flex w-full shrink-0 flex-wrap items-center justify-between gap-y-3 md:mt-12 md:mb-8">
           <div className="flex items-center gap-3">
-            <Typography variant="h1">
-              {view === "places" ? "Your Places" : "Your Pins"}
+            <Typography variant="h1" className="text-2xl whitespace-nowrap md:text-3xl">
+              {view === "places"
+                ? "Your Places"
+                : view === "videos"
+                  ? "Your Videos"
+                  : "Your Pins"}
             </Typography>
             {/* Mobile-only view switch; desktop uses the sidebar Places tab */}
             <div className="flex md:hidden">
-              {(["pins", "places"] as const).map((v) => (
+              {(["pins", "places", "videos"] as const).map((v) => (
                 <button
                   key={v}
                   onClick={() => setView(v)}
-                  className={`cursor-pointer border-2 border-black px-2 py-0.5 text-xs font-semibold uppercase first:border-r-0 ${
+                  className={`cursor-pointer border-2 border-black px-2 py-0.5 text-xs font-semibold uppercase not-first:border-l-0 ${
                     view === v ? "bg-black text-white" : "bg-white"
                   }`}
                 >

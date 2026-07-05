@@ -66,7 +66,11 @@ export const Search = () => {
           }}
         />
       </div>
-      {!isMobile && <Typography variant="muted">{modifierKey}+k</Typography>}
+      {!isMobile && (
+        <Typography variant="muted" className="hidden sm:block">
+          {modifierKey}+k
+        </Typography>
+      )}
     </div>
   );
 };

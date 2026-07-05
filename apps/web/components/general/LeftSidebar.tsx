@@ -2,7 +2,7 @@
 
 import { Typography } from "../typography/Typography";
 import { authClient } from "@/lib/clients/auth-browser";
-import { LogOut, Key, MapPin } from "lucide-react";
+import { LogOut, Key, MapPin, Play } from "lucide-react";
 import useSWR from "swr";
 import { PinRequests } from "@/lib/requests/PinRequests";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -12,7 +12,7 @@ import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { usePinStore } from "@/lib/stores/usePinStore";
 
-const ProfileSection = () => {
+export const ProfileSection = () => {
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
 
@@ -60,7 +60,7 @@ const ProfileSection = () => {
   );
 };
 
-const CollectionsSection = () => {
+export const CollectionsSection = () => {
   const { data: session } = authClient.useSession();
   const { data: pins } = useSWR(
     session?.user ? "/api/pins" : null,
@@ -71,12 +71,17 @@ const CollectionsSection = () => {
   const view = usePinStore((s) => s.view);
   const setView = usePinStore((s) => s.setView);
 
-  const { collections, placeCount } = useMemo(() => {
+  const { collections, placeCount, videoCount } = useMemo(() => {
     let placeCount = 0;
+    let videoCount = 0;
     const counts: Record<string, number> = {};
     for (const pin of pins ?? []) {
       if (pin.latitude != null) {
         placeCount++;
+        continue;
+      }
+      if (pin.durationSec != null) {
+        videoCount++;
         continue;
       }
       const cat = pin.category ?? "Other";
@@ -93,13 +98,14 @@ const CollectionsSection = () => {
         count,
       }));
 
-    const totalCount = (pins?.length ?? 0) - placeCount;
+    const totalCount = (pins?.length ?? 0) - placeCount - videoCount;
     return {
       collections: [
         { name: "ALL", color: null as string | null, count: totalCount },
         ...categories,
       ],
       placeCount,
+      videoCount,
     };
   }, [pins]);
 
@@ -119,7 +125,7 @@ const CollectionsSection = () => {
           setView("places");
           setSelectedCategory(null);
         }}
-        className={`mb-4 flex shrink-0 cursor-pointer items-center justify-between border-[3px] border-black p-3 ${
+        className={`mb-2 flex shrink-0 cursor-pointer items-center justify-between border-[3px] border-black p-3 ${
           view === "places" ? "bg-black text-white" : "bg-white hover:bg-gray-50"
         }`}
       >
@@ -128,6 +134,21 @@ const CollectionsSection = () => {
           <Typography className="text-sm font-bold">Places</Typography>
         </div>
         <Typography className="text-sm">{placeCount}</Typography>
+      </div>
+      <div
+        onClick={() => {
+          setView("videos");
+          setSelectedCategory(null);
+        }}
+        className={`mb-4 flex shrink-0 cursor-pointer items-center justify-between border-[3px] border-black p-3 ${
+          view === "videos" ? "bg-black text-white" : "bg-white hover:bg-gray-50"
+        }`}
+      >
+        <div className="flex items-center gap-2">
+          <Play className="h-4 w-4 shrink-0" />
+          <Typography className="text-sm font-bold">Videos</Typography>
+        </div>
+        <Typography className="text-sm">{videoCount}</Typography>
       </div>
       <div className="mb-3 flex w-1/2 shrink-0 items-center gap-2">
         <div className="h-px flex-1 bg-black/20" />

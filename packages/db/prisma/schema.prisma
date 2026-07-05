@@ -93,6 +93,9 @@ model Pin {
   platform    String                    @default("web")
   latitude    Float?
   longitude   Float?
+  stars       Int?
+  language    String?
+  durationSec Int?
   tsv         Unsupported("tsvector")?
   archivedAt  DateTime?                 @map("archived_at")
   createdAt   DateTime                  @default(now())
@@ -108,6 +111,7 @@ model PinChunk {
   pin      Pin                       @relation(fields: [pinId], references: [id], onDelete: Cascade)
   sequence Int
   content  String
+  startSec Int?
   tsv      Unsupported("tsvector")?
 
   @@unique([pinId, sequence])

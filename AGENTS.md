@@ -14,6 +14,7 @@ Save links ("pins") by texting them to a Twilio number or via the web UI. Pins g
 
 1. Create: SMS -> `POST /webhook/twilio` (apps/api, form-encoded `From`/`Body`), or web -> `POST /api/pins` (apps/web, session auth). Both create a Pin with `status: "PROCESSING"` and publish `{phone, link, pinUniqueId}` to QStash.
 2. Process: QStash calls back `POST /webhook/process` (apps/api): `scrapeLink` (regex-based HTML scrape, no DOM lib) -> `chunkText` -> `classifyPin` (Claude Haiku, falls back to `"Other"`) -> updates Pin + `PinChunk` rows.
+   - Special link types in `scrapeLink`: map links (`utils/maps.ts`) yield coords + place name; GitHub repo-root links (`utils/github.ts`) skip the HTML scrape and use the GitHub API for `owner/repo` title, description, stars, language, and the README as chunk content (unauthenticated, 60 req/hr; falls back to normal scrape).
 3. Search: `tsv` tsvector columns on `Pin`/`PinChunk` (Prisma `Unsupported`, maintained in the DB), queried via `searchPins` raw SQL with prefix matching + snippets.
 
 ## Auth

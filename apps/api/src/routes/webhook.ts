@@ -3,6 +3,11 @@ import { prisma } from "@pinmy/db";
 import { validateURL } from "../utils/helpers";
 import { scrapeLink } from "../services/scraper.service";
 import { chunkText } from "../utils/chunker";
+import {
+  getYouTubeVideoId,
+  fetchYouTubeVideo,
+  chunkTranscript,
+} from "../utils/youtube";
 import { classifyPin } from "../services/classifier.service";
 import { MessageQueueClient } from "@pinmy/queue";
 import type { Context } from "hono";
@@ -91,6 +96,36 @@ webhook.post("/process", async (c) => {
     return c.json({ error: "pin not found" }, 404);
   }
 
+  // YouTube links: metadata + transcript via the player API; transcript chunks
+  // carry timestamps so search results can deep-link into the video.
+  const videoId = getYouTubeVideoId(link);
+  const video = videoId ? await fetchYouTubeVideo(videoId) : null;
+  if (video) {
+    const category = await classifyPin(video.title, video.description, link, false);
+    const chunks = video.transcript.length
+      ? chunkTranscript(video.transcript)
+      : chunkText(video.description);
+    if (chunks.length) {
+      await prisma.pinChunk.createMany({
+        data: chunks.map((chunk) => ({ pinId: pin.id, ...chunk })),
+      });
+    }
+    const updatedPin = await prisma.pin.update({
+      where: { id: pin.id },
+      data: {
+        ...(pin.title === pin.link && {
+          title: video.title || pin.link,
+          description: video.description || null,
+        }),
+        category,
+        image: video.thumbnail || null,
+        durationSec: video.durationSec,
+        status: "READY",
+      },
+    });
+    return c.json({ status: "created", pin: updatedPin }, 201);
+  }
+
   const { scraped, category } = await scrapeAndClassify(link);
   await createChunks(scraped.content, pin.id);
 
@@ -106,6 +141,8 @@ webhook.post("/process", async (c) => {
       image: scraped.image || null,
       latitude: scraped.latitude,
       longitude: scraped.longitude,
+      stars: scraped.stars,
+      language: scraped.language,
       status: "READY",
     },
   });

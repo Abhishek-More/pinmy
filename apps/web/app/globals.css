@@ -154,8 +154,19 @@ body {
   }
 }
 
-/* Numbered map markers for the Places view */
-.place-marker {
+/* Dot markers + cluster bubbles for the Places view */
+.place-dot {
+  width: 100%;
+  height: 100%;
+  border: 2px solid #111;
+}
+
+.place-dot-selected {
+  border-width: 3px;
+  box-shadow: -3px 3px 0 #111;
+}
+
+.place-cluster {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -168,10 +179,6 @@ body {
   font-family: var(--font-jetbrains-mono), monospace;
   font-size: 13px;
   font-weight: 700;
-}
-
-.place-marker-selected {
-  color: #fff;
 }
 
 .leaflet-container {

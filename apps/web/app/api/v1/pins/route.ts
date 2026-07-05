@@ -74,6 +74,7 @@ export async function GET(request: Request) {
         category: true,
         latitude: true,
         longitude: true,
+        durationSec: true,
         status: true,
         platform: true,
         createdAt: true,
@@ -98,6 +99,8 @@ function formatPin(pin: {
   category?: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  durationSec?: number | null;
+  startSec?: number | null;
   status: string;
   platform: string;
   createdAt: string | Date;
@@ -112,6 +115,8 @@ function formatPin(pin: {
     category: pin.category ?? null,
     latitude: pin.latitude ?? null,
     longitude: pin.longitude ?? null,
+    duration_sec: pin.durationSec ?? null,
+    start_sec: pin.startSec ?? null,
     status: pin.status,
     platform: pin.platform,
     created_at: pin.createdAt,
