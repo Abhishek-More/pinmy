@@ -36,6 +36,11 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+  session: {
+    // Default 7-day expiry forced weekly OTP for anyone visiting less often.
+    expiresIn: 60 * 60 * 24 * 90, // 90 days
+    updateAge: 60 * 60 * 24, // slide the window at most once a day on activity
+  },
   plugins: [
     jwt({
       jwt: {
