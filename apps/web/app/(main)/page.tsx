@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Login } from "@/components/auth/login";
 import { PinStream } from "@/components/pins/PinStream";
 import { Search } from "@/components/pins/Search";
+import { CollectionSelect } from "@/components/pins/CollectionSelect";
 import { PlacesView } from "@/components/places/PlacesView";
 import { Typography } from "@/components/typography/Typography";
 import { Button } from "@/components/ui/button";
@@ -114,13 +115,16 @@ export default function Home() {
               ))}
             </div>
           </div>
-          <div className="brutal-shadow-accent-wrapper">
-            <Button
-              onClick={openCreatePin}
-              className="text-accent cursor-pointer border-2 border-black p-3 font-semibold md:p-4"
-            >
-              <Typography>+ NEW PIN</Typography>
-            </Button>
+          <div className="flex items-center gap-3">
+            {view === "pins" && <CollectionSelect />}
+            <div className="brutal-shadow-accent-wrapper">
+              <Button
+                onClick={openCreatePin}
+                className="text-accent cursor-pointer border-2 border-black p-3 font-semibold md:p-4"
+              >
+                <Typography>+ NEW PIN</Typography>
+              </Button>
+            </div>
           </div>
         </div>
         {view === "places" ? (

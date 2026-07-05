@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import { Menu, X } from "lucide-react";
-import { ProfileSection, CollectionsSection } from "./LeftSidebar";
+import { ProfileSection, ViewTabs } from "./LeftSidebar";
 
-/** Mobile-only slide-in drawer exposing the desktop sidebar's profile + collections. */
+/** Mobile-only slide-in drawer exposing the desktop sidebar's profile + view tabs. */
 export const MobileNav = () => {
   const [open, setOpen] = useState(false);
 
@@ -44,7 +44,7 @@ export const MobileNav = () => {
             onClick={() => setOpen(false)}
           >
             <ProfileSection />
-            <CollectionsSection />
+            <ViewTabs />
           </div>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>

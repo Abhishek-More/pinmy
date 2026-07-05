@@ -2,12 +2,11 @@
 
 import { Typography } from "../typography/Typography";
 import { authClient } from "@/lib/clients/auth-browser";
-import { LogOut, Key, MapPin, Play } from "lucide-react";
+import { LogOut, Key, MapPin, Pin, Play } from "lucide-react";
 import useSWR from "swr";
 import { PinRequests } from "@/lib/requests/PinRequests";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Identicon } from "./Identicon";
-import { CATEGORY_COLORS } from "@pinmy/config";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { usePinStore } from "@/lib/stores/usePinStore";
@@ -60,125 +59,52 @@ export const ProfileSection = () => {
   );
 };
 
-export const CollectionsSection = () => {
+const VIEW_TABS = [
+  { view: "pins", label: "Pins", icon: Pin },
+  { view: "places", label: "Places", icon: MapPin },
+  { view: "videos", label: "Videos", icon: Play },
+] as const;
+
+export const ViewTabs = () => {
   const { data: session } = authClient.useSession();
   const { data: pins } = useSWR(
     session?.user ? "/api/pins" : null,
     PinRequests.list,
   );
-  const selectedCategory = usePinStore((s) => s.selectedCategory);
-  const setSelectedCategory = usePinStore((s) => s.setSelectedCategory);
   const view = usePinStore((s) => s.view);
   const setView = usePinStore((s) => s.setView);
+  const setSelectedCategory = usePinStore((s) => s.setSelectedCategory);
 
-  const { collections, placeCount, videoCount } = useMemo(() => {
-    let placeCount = 0;
-    let videoCount = 0;
-    const counts: Record<string, number> = {};
+  const counts = useMemo(() => {
+    const tally = { pins: 0, places: 0, videos: 0 };
     for (const pin of pins ?? []) {
-      if (pin.latitude != null) {
-        placeCount++;
-        continue;
-      }
-      if (pin.durationSec != null) {
-        videoCount++;
-        continue;
-      }
-      const cat = pin.category ?? "Other";
-      counts[cat] = (counts[cat] ?? 0) + 1;
+      if (pin.latitude != null) tally.places++;
+      else if (pin.durationSec != null) tally.videos++;
+      else tally.pins++;
     }
-
-    const categories = Object.entries(counts)
-      .sort((a, b) => b[1] - a[1])
-      .map(([name, count]) => ({
-        name,
-        color:
-          CATEGORY_COLORS[name as keyof typeof CATEGORY_COLORS] ??
-          CATEGORY_COLORS["Other"],
-        count,
-      }));
-
-    const totalCount = (pins?.length ?? 0) - placeCount - videoCount;
-    return {
-      collections: [
-        { name: "ALL", color: null as string | null, count: totalCount },
-        ...categories,
-      ],
-      placeCount,
-      videoCount,
-    };
+    return tally;
   }, [pins]);
 
-  const isSelected = (name: string) =>
-    view === "pins" &&
-    (name === "ALL" ? selectedCategory === null : selectedCategory === name);
-
-  const selectCollection = (name: string) => {
-    setView("pins");
-    setSelectedCategory(name === "ALL" ? null : name);
-  };
-
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-0">
-      <div
-        onClick={() => {
-          setView("places");
-          setSelectedCategory(null);
-        }}
-        className={`mb-2 flex shrink-0 cursor-pointer items-center justify-between border-[3px] border-black p-3 ${
-          view === "places" ? "bg-black text-white" : "bg-white hover:bg-gray-50"
-        }`}
-      >
-        <div className="flex items-center gap-2">
-          <MapPin className="h-4 w-4 shrink-0" />
-          <Typography className="text-sm font-bold">Places</Typography>
-        </div>
-        <Typography className="text-sm">{placeCount}</Typography>
-      </div>
-      <div
-        onClick={() => {
-          setView("videos");
-          setSelectedCategory(null);
-        }}
-        className={`mb-4 flex shrink-0 cursor-pointer items-center justify-between border-[3px] border-black p-3 ${
-          view === "videos" ? "bg-black text-white" : "bg-white hover:bg-gray-50"
-        }`}
-      >
-        <div className="flex items-center gap-2">
-          <Play className="h-4 w-4 shrink-0" />
-          <Typography className="text-sm font-bold">Videos</Typography>
-        </div>
-        <Typography className="text-sm">{videoCount}</Typography>
-      </div>
-      <div className="mb-3 flex w-1/2 shrink-0 items-center gap-2">
-        <div className="h-px flex-1 bg-black/20" />
-        <Typography variant="label">Collections</Typography>
-        <div className="h-px flex-1 bg-black/20" />
-      </div>
-      <div className="scrollbar-hide overflow-y-auto border">
-        {collections.map((col) => (
-          <div
-            key={col.name}
-            onClick={() => selectCollection(col.name)}
-            className={`mt-2 flex cursor-pointer items-center justify-between border-[3px] border-black p-3 first:mt-0 ${
-              isSelected(col.name)
-                ? "bg-black text-white"
-                : "bg-white hover:bg-gray-50"
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              {col.color && (
-                <div
-                  className="h-3 w-3 shrink-0 rounded-full border border-black"
-                  style={{ backgroundColor: col.color }}
-                />
-              )}
-              <Typography className="text-sm font-bold">{col.name}</Typography>
-            </div>
-            <Typography className="text-sm">{col.count}</Typography>
+    <div className="flex shrink-0 flex-col">
+      {VIEW_TABS.map(({ view: tab, label, icon: Icon }) => (
+        <div
+          key={tab}
+          onClick={() => {
+            setView(tab);
+            setSelectedCategory(null);
+          }}
+          className={`mb-2 flex shrink-0 cursor-pointer items-center justify-between border-[3px] border-black p-3 ${
+            view === tab ? "bg-black text-white" : "bg-white hover:bg-gray-50"
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <Icon className="h-4 w-4 shrink-0" />
+            <Typography className="text-sm font-bold">{label}</Typography>
           </div>
-        ))}
-      </div>
+          <Typography className="text-sm">{counts[tab]}</Typography>
+        </div>
+      ))}
     </div>
   );
 };
@@ -216,8 +142,8 @@ export const LeftSidebar = () => {
       {/* Profile */}
       <ProfileSection />
 
-      {/* Collections */}
-      <CollectionsSection />
+      {/* Views */}
+      <ViewTabs />
     </div>
   );
 };

@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import useSWR from "swr";
 import { ArrowUpRight, Ellipsis, MapPin } from "lucide-react";
 import { Typography } from "../typography/Typography";
+import { CategorySelect } from "../general/CategorySelect";
 import { Skeleton } from "@/components/ui/skeleton";
 import { authClient } from "@/lib/clients/auth-browser";
 import { PinRequests } from "@/lib/requests/PinRequests";
@@ -23,14 +24,29 @@ const categoryColor = (category: string | undefined) =>
   CATEGORY_COLORS[(category ?? "Other") as keyof typeof CATEGORY_COLORS] ??
   CATEGORY_COLORS["Other"];
 
+function milesBetween(from: [number, number], lat: number, lng: number): number {
+  const R = 3958.8; // earth radius in miles
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(lat - from[0]);
+  const dLng = toRad(lng - from[1]);
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(from[0])) * Math.cos(toRad(lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+
+const formatMiles = (mi: number) => (mi < 0.1 ? "<0.1 mi" : `${mi.toFixed(1)} mi`);
+
 const PlaceCard = ({
   place,
   index,
+  distance,
   selected,
   onSelect,
 }: {
   place: PlacePin;
   index: number;
+  distance?: string;
   selected: boolean;
   onSelect: () => void;
 }) => {
@@ -62,6 +78,7 @@ const PlaceCard = ({
         </Typography>
         <Typography variant="small" className="mt-1 font-semibold">
           {place.category ?? "Other"}
+          {distance && <span className="text-black/40"> · {distance}</span>}
         </Typography>
         {place.note && (
           <p className="text-muted-foreground mt-2 border-l-[3px] border-black pl-2.5 text-sm leading-relaxed">
@@ -115,6 +132,7 @@ export const PlacesView = () => {
   const [category, setCategory] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mobilePane, setMobilePane] = useState<"list" | "map">("list");
+  const [userPos, setUserPos] = useState<[number, number] | null>(null);
 
   const allPlaces = useMemo(() => {
     const located = (pins ?? []).filter(
@@ -135,15 +153,25 @@ export const PlacesView = () => {
       const cat = p.category ?? "Other";
       counts[cat] = (counts[cat] ?? 0) + 1;
     }
-    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, count]) => ({ name, count }));
   }, [allPlaces]);
 
   const q = searchQuery.trim().toLowerCase();
-  const places = allPlaces.filter(
+  const filtered = allPlaces.filter(
     (p) =>
       (!category || (p.category ?? "Other") === category) &&
       (!q || p.title.toLowerCase().includes(q)),
   );
+  // With a known location, nearest first
+  const places = userPos
+    ? [...filtered].sort(
+        (a, b) =>
+          milesBetween(userPos, a.latitude, a.longitude) -
+          milesBetween(userPos, b.latitude, b.longitude),
+      )
+    : filtered;
 
   // Map click -> scroll the matching card into view.
   useEffect(() => {
@@ -170,32 +198,14 @@ export const PlacesView = () => {
 
   return (
     <div className="flex h-full w-full flex-col gap-3 pb-4">
-      {/* Filter chips + mobile pane toggle */}
+      {/* Category filter + mobile pane toggle */}
       <div className="flex w-full shrink-0 items-center justify-between gap-3">
-        <div className="scrollbar-hide flex min-w-0 gap-2 overflow-x-auto">
-          <button
-            onClick={() => setCategory(null)}
-            className={`shrink-0 cursor-pointer border-2 border-black px-2 py-0.5 text-sm font-semibold ${
-              category === null ? "bg-black text-white" : "bg-white hover:bg-gray-50"
-            }`}
-          >
-            ALL {allPlaces.length}
-          </button>
-          {chips.map(([name, count]) => (
-            <button
-              key={name}
-              onClick={() => setCategory(category === name ? null : name)}
-              className={`shrink-0 cursor-pointer border-2 border-black px-2 py-0.5 text-sm font-semibold ${
-                category === name ? "text-white" : "hover:opacity-80"
-              }`}
-              style={{
-                backgroundColor: category === name ? "#111" : categoryColor(name),
-              }}
-            >
-              {name} {count}
-            </button>
-          ))}
-        </div>
+        <CategorySelect
+          allLabel="All places"
+          options={chips}
+          value={category}
+          onChange={setCategory}
+        />
         <div className="flex shrink-0 md:hidden">
           {(["list", "map"] as const).map((pane) => (
             <button
@@ -227,6 +237,11 @@ export const PlacesView = () => {
               key={place.uniqueId}
               place={place}
               index={place.number}
+              distance={
+                userPos
+                  ? formatMiles(milesBetween(userPos, place.latitude, place.longitude))
+                  : undefined
+              }
               selected={place.uniqueId === selectedId}
               onSelect={() => setSelectedId(place.uniqueId)}
             />
@@ -247,6 +262,8 @@ export const PlacesView = () => {
             selectedId={selectedId}
             onSelect={setSelectedId}
             visKey={mobilePane}
+            userPos={userPos}
+            onLocated={setUserPos}
           />
         </div>
       </div>

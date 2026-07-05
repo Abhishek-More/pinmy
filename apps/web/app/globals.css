@@ -181,6 +181,33 @@ body {
   font-weight: 700;
 }
 
+/* "You are here" marker from the locate button */
+.user-dot {
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  background: #ffd800;
+  border: 3px solid #111;
+  box-shadow: 0 0 0 4px rgba(255, 216, 0, 0.35);
+}
+
+.leaflet-popup-content-wrapper {
+  border: 3px solid #111;
+  border-radius: 0;
+  box-shadow: -4px 4px 0 #111;
+}
+
+.leaflet-popup-content {
+  margin: 10px 12px;
+  font-family: var(--font-jetbrains-mono), monospace;
+}
+
+.leaflet-popup-tip {
+  border: 2px solid #111;
+  border-radius: 0;
+  box-shadow: none;
+}
+
 .leaflet-container {
   font-family: var(--font-jetbrains-mono), monospace;
 }
