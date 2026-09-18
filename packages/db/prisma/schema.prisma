@@ -103,6 +103,10 @@ model Pin {
   User        User                      @relation(fields: [userId], references: [id])
   userId      String
   chunks      PinChunk[]
+
+  // Every list/search query filters on these; without it each read is a seq scan.
+  @@index([userId, archivedAt])
+  @@index([tsv], type: Gin)
 }
 
 model PinChunk {
@@ -114,8 +118,9 @@ model PinChunk {
   startSec Int?
   tsv      Unsupported("tsvector")?
 
+  // (pinId, sequence) unique already covers pinId lookups.
   @@unique([pinId, sequence])
-  @@index([pinId])
+  @@index([tsv], type: Gin)
   @@map("pin_chunk")
 }
 

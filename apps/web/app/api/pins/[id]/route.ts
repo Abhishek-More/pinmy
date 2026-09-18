@@ -44,16 +44,9 @@ export async function PUT(
     );
   }
 
-  const existing = await prisma.pin.findFirst({
+  // Ownership filter in the write itself: one round trip instead of lookup + update.
+  const [pin] = await prisma.pin.updateManyAndReturn({
     where: { uniqueId: id, userId: session.user.id, archivedAt: null },
-  });
-
-  if (!existing) {
-    return Response.json({ error: "pin not found" }, { status: 404 });
-  }
-
-  const pin = await prisma.pin.update({
-    where: { uniqueId: id },
     data: {
       title,
       link,
@@ -63,6 +56,10 @@ export async function PUT(
         : {}),
     },
   });
+
+  if (!pin) {
+    return Response.json({ error: "pin not found" }, { status: 404 });
+  }
 
   return Response.json(pin);
 }
@@ -77,18 +74,14 @@ export async function DELETE(
   }
 
   const { id } = await ctx.params;
-  const existing = await prisma.pin.findFirst({
+  const { count } = await prisma.pin.updateMany({
     where: { uniqueId: id, userId: session.user.id, archivedAt: null },
-  });
-
-  if (!existing) {
-    return Response.json({ error: "pin not found" }, { status: 404 });
-  }
-
-  await prisma.pin.update({
-    where: { uniqueId: id },
     data: { archivedAt: new Date() },
   });
+
+  if (count === 0) {
+    return Response.json({ error: "pin not found" }, { status: 404 });
+  }
 
   return new Response(null, { status: 204 });
 }

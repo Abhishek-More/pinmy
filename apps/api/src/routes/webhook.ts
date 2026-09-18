@@ -28,18 +28,6 @@ async function validateAndResolveUser(phone: string, link: string, c: Context) {
   return { user, error: null };
 }
 
-async function scrapeAndClassify(link: string) {
-  const scraped = await scrapeLink(link);
-  const isPlace = scraped.latitude != null;
-  const category = await classifyPin(
-    scraped.title,
-    scraped.description,
-    link,
-    isPlace,
-  );
-  return { scraped, category };
-}
-
 async function createChunks(content: string, pinId: number) {
   const chunks = chunkText(content);
   if (chunks.length === 0) return;
@@ -80,18 +68,18 @@ webhook.post("/twilio", async (c) => {
 
 webhook.post("/process", async (c) => {
   const body = await c.req.json();
-  const phone = body.phone as string;
   const link = body.link as string;
   const pinUniqueId = body.pinUniqueId as string;
 
-  const { error } = await validateAndResolveUser(phone, link, c);
-  if (error) return error;
-
-  if (!pinUniqueId) {
-    return c.json({ error: "pinUniqueId is required" }, 400);
+  if (!link || !pinUniqueId) {
+    return c.json({ error: "link and pinUniqueId are required" }, 400);
+  }
+  if (!validateURL(link)) {
+    return c.json({ error: "invalid link" }, 400);
   }
 
-  const pin = await prisma.pin.findFirst({ where: { uniqueId: pinUniqueId } });
+  // The pin's FK already proves the user exists; no separate phone lookup needed.
+  const pin = await prisma.pin.findUnique({ where: { uniqueId: pinUniqueId } });
   if (!pin) {
     return c.json({ error: "pin not found" }, 404);
   }
@@ -101,15 +89,15 @@ webhook.post("/process", async (c) => {
   const videoId = getYouTubeVideoId(link);
   const video = videoId ? await fetchYouTubeVideo(videoId) : null;
   if (video) {
-    const category = await classifyPin(video.title, video.description, link, false);
     const chunks = video.transcript.length
       ? chunkTranscript(video.transcript)
       : chunkText(video.description);
-    if (chunks.length) {
-      await prisma.pinChunk.createMany({
-        data: chunks.map((chunk) => ({ pinId: pin.id, ...chunk })),
-      });
-    }
+    const [category] = await Promise.all([
+      classifyPin(video.title, video.description, link, false),
+      chunks.length
+        ? prisma.pinChunk.createMany({ data: chunks.map((chunk) => ({ pinId: pin.id, ...chunk })) })
+        : null,
+    ]);
     const updatedPin = await prisma.pin.update({
       where: { id: pin.id },
       data: {
@@ -126,8 +114,12 @@ webhook.post("/process", async (c) => {
     return c.json({ status: "created", pin: updatedPin }, 201);
   }
 
-  const { scraped, category } = await scrapeAndClassify(link);
-  await createChunks(scraped.content, pin.id);
+  const scraped = await scrapeLink(link);
+  // Chunk insert and the Claude call are independent; overlap them.
+  const [category] = await Promise.all([
+    classifyPin(scraped.title, scraped.description, link, scraped.latitude != null),
+    createChunks(scraped.content, pin.id),
+  ]);
 
   const updatedPin = await prisma.pin.update({
     where: { id: pin.id },

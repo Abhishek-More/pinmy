@@ -30,21 +30,21 @@ export async function GET(request: Request) {
     select: { createdAt: true },
   });
 
+  const counts = new Map<string, number>();
+  for (const { createdAt } of pins) {
+    const day = new Date(createdAt);
+    day.setHours(0, 0, 0, 0);
+    const key = day.toISOString().slice(0, 10);
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+
   const data = [];
   for (let i = days - 1; i >= 0; i--) {
     const date = new Date(now);
     date.setDate(now.getDate() - i);
     date.setHours(0, 0, 0, 0);
-    const nextDate = new Date(date);
-    nextDate.setDate(date.getDate() + 1);
-    const count = pins.filter(
-      (p) => p.createdAt >= date && p.createdAt < nextDate,
-    ).length;
-    data.push({
-      date: date.toISOString().slice(0, 10),
-      dow: date.getDay(),
-      count,
-    });
+    const key = date.toISOString().slice(0, 10);
+    data.push({ date: key, dow: date.getDay(), count: counts.get(key) ?? 0 });
   }
 
   return Response.json(data);
