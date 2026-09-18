@@ -40,6 +40,9 @@ export const auth = betterAuth({
     // Default 7-day expiry forced weekly OTP for anyone visiting less often.
     expiresIn: 60 * 60 * 24 * 90, // 90 days
     updateAge: 60 * 60 * 24, // slide the window at most once a day on activity
+    // Signed cookie copy of the session so getSession (client hook and API routes)
+    // skips the DB round trip. Sign-out elsewhere propagates within maxAge.
+    cookieCache: { enabled: true, maxAge: 5 * 60 },
   },
   plugins: [
     jwt({

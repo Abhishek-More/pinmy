@@ -7,7 +7,6 @@ import { ArrowUpRight, Ellipsis, MapPin } from "lucide-react";
 import { Typography } from "../typography/Typography";
 import { CategorySelect } from "../general/CategorySelect";
 import { Skeleton } from "@/components/ui/skeleton";
-import { authClient } from "@/lib/clients/auth-browser";
 import { PinRequests } from "@/lib/requests/PinRequests";
 import { usePinStore } from "@/lib/stores/usePinStore";
 import { useModalStore } from "@/lib/stores/useModalStore";
@@ -122,12 +121,9 @@ const PlaceCard = ({
 
 export const PlacesView = () => {
   const searchQuery = usePinStore((s) => s.searchQuery);
-  const { data: session } = authClient.useSession();
-  const { data: pins } = useSWR(
-    session?.user ? "/api/pins" : null,
-    PinRequests.list,
-    { refreshInterval: 5000 },
-  );
+  const { data: pins } = useSWR("/api/pins", PinRequests.list, {
+    refreshInterval: (data) => (data?.some((p) => p.status === "PROCESSING") ? 5000 : 0),
+  });
 
   const [category, setCategory] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);

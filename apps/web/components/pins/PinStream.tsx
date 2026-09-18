@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import useSWR from "swr";
 import { Typography } from "../typography/Typography";
 import { PinSkeleton } from "./PinSkeleton";
@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/clients/auth-browser";
 import { PinRequests, type PinWithSnippet } from "@/lib/requests/PinRequests";
 import { usePinStore } from "@/lib/stores/usePinStore";
 
@@ -24,30 +23,19 @@ export const PinStream = () => {
   const searchQuery = usePinStore((s) => s.searchQuery);
   const selectedCategory = usePinStore((s) => s.selectedCategory);
   const view = usePinStore((s) => s.view);
-  const { data: session, isPending } = authClient.useSession();
 
-  const swrKey = session?.user
-    ? searchQuery
-      ? `/api/pins?q=${encodeURIComponent(searchQuery)}`
-      : "/api/pins"
-    : null;
+  const swrKey = searchQuery
+    ? `/api/pins?q=${encodeURIComponent(searchQuery)}`
+    : "/api/pins";
 
-  const { data: fetchedPins } = useSWR<PinWithSnippet[]>(
+  const { data: fetchedPins, error: fetchError } = useSWR<PinWithSnippet[]>(
     swrKey,
     PinRequests.list,
-    { refreshInterval: 5000 },
+    // ponytail: poll only while something is still processing; otherwise mutations revalidate.
+    { refreshInterval: (data) => (data?.some((p) => p.status === "PROCESSING") ? 5000 : 0) },
   );
 
-  const [timedOut, setTimedOut] = useState(false);
-
-  useEffect(() => {
-    if (!isPending) return;
-    const timer = setTimeout(() => setTimedOut(true), 3000);
-    return () => clearTimeout(timer);
-  }, [isPending]);
-
-  const isLoading = !timedOut && (isPending || (session?.user && !fetchedPins));
-  const allPins = isLoading ? null : (fetchedPins ?? []);
+  const allPins = fetchedPins ?? (fetchError ? [] : null);
   const scoped = allPins?.filter((p) => {
     if (view === "places") return p.latitude != null;
     if (view === "videos") return p.durationSec != null;
@@ -92,9 +80,7 @@ export const PinStream = () => {
                   <Pin pin={pin} />
                 </div>
               ))
-            : session?.user &&
-              !searchQuery &&
-              !selectedCategory && <EmptyState />
+            : !searchQuery && !selectedCategory && <EmptyState />
           : Array.from({ length: 2 }).map((_, i) => (
               <PinSkeleton key={`skeleton-${i}`} />
             ))}

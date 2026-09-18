@@ -66,11 +66,7 @@ const VIEW_TABS = [
 ] as const;
 
 export const ViewTabs = () => {
-  const { data: session } = authClient.useSession();
-  const { data: pins } = useSWR(
-    session?.user ? "/api/pins" : null,
-    PinRequests.list,
-  );
+  const { data: pins } = useSWR("/api/pins", PinRequests.list);
   const view = usePinStore((s) => s.view);
   const setView = usePinStore((s) => s.setView);
   const setSelectedCategory = usePinStore((s) => s.setSelectedCategory);
@@ -110,11 +106,7 @@ export const ViewTabs = () => {
 };
 
 export const LeftSidebar = () => {
-  const { data: session } = authClient.useSession();
-  const { data: pins } = useSWR(
-    session?.user ? "/api/pins" : null,
-    PinRequests.list,
-  );
+  const { data: pins } = useSWR("/api/pins", PinRequests.list);
 
   const totalCount = pins?.length ?? 0;
 

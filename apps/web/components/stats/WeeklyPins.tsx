@@ -230,7 +230,7 @@ export const WeeklyPins = () => {
 
   const { data: session, isPending } = authClient.useSession();
   const { data: allData } = useSWR<DayCount[]>(
-    session?.user ? `/api/pins/weekly?days=${FETCH_DAYS}` : null,
+    `/api/pins/weekly?days=${FETCH_DAYS}`,
     PinRequests.weekly,
   );
 

@@ -2,16 +2,14 @@
 
 import { useMemo } from "react";
 import useSWR from "swr";
-import { authClient } from "@/lib/clients/auth-browser";
 import { PinRequests } from "@/lib/requests/PinRequests";
 import { usePinStore } from "@/lib/stores/usePinStore";
 import { CategorySelect } from "../general/CategorySelect";
 
 /** Collection filter for the regular pins view, bound to the pin store. */
 export const CollectionSelect = () => {
-  const { data: session } = authClient.useSession();
   const { data: pins } = useSWR(
-    session?.user ? "/api/pins" : null,
+    "/api/pins",
     PinRequests.list,
   );
   const selectedCategory = usePinStore((s) => s.selectedCategory);
